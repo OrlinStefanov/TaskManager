@@ -11,10 +11,11 @@ namespace TaskManager.Extensions
 		//map endpoints for the application
 		public static void MapEndpoints(this WebApplication app)
 		{
-			MapUserEndpoints(app);
+			//MapUserEndpointsTestSeeder(app); // This method maps user-related endpoints for testing and seeding purposes.
+			UserRegisterEnpoints(app); // This method maps user registration and login endpoints.
 		}
 
-		public static void MapUserEndpoints(this WebApplication app)
+		public static void MapUserEndpointsTestSeeder(this WebApplication app)
 		{
 			//GET USER'S INFORMATION
 			app.MapGet("/users/info", async (UserManager<ApplicationUser> userManager) =>
@@ -59,6 +60,81 @@ namespace TaskManager.Extensions
 
 				return Results.BadRequest(result.Errors.Select(e => e.Description));
 			}).WithSummary("Creates user using Name, Password and Email");
+		}
+		public static void UserRegisterEnpoints(this WebApplication app)
+		{
+			//register user
+			app.MapPost("/register", async (
+				UserManager<ApplicationUser> userManager,
+				[FromBody] ApplicationUserDTO model) =>
+			{
+				//check for incomplete user information
+				if (string.IsNullOrEmpty(model.User_Name) ||
+					string.IsNullOrEmpty(model.User_Email) ||
+					string.IsNullOrEmpty(model.User_Password))
+				{
+					return Results.BadRequest("User information is incomplete.");
+				}
+
+				//check for existing email
+				var existingEmail = await userManager.FindByEmailAsync(model.User_Email);
+
+				if (existingEmail != null)
+				{
+					return Results.BadRequest("Email already exists.");
+				}
+
+				//check for existing username
+				var existingUser = await userManager.FindByNameAsync(model.User_Name);
+				if (existingUser != null)
+				{
+					return Results.BadRequest("Username already exists.");
+				}
+
+				var result = await userManager.CreateAsync(new ApplicationUser
+				{
+					UserName = model.User_Name,
+					Email = model.User_Email,
+				}, model.User_Password);
+
+				if (result.Succeeded)
+				{
+					return Results.Ok("User registered successfully.");
+				}
+
+				return Results.BadRequest(result.Errors.Select(e => e.Description));
+			}).WithSummary("Registers new user by given username, email and password");
+
+			//login user
+			app.MapPost("/login", async
+				(
+				UserManager<ApplicationUser> userManager,
+				SignInManager<ApplicationUser> signInManager,
+				[FromBody] LogInDTO model) =>
+			{
+				if (string.IsNullOrEmpty(model.UserNameOrEmail) || string.IsNullOrEmpty(model.Password))
+				{
+					return Results.BadRequest("Username and password are required.");
+				}
+				
+				var user = await userManager.FindByNameAsync(model.UserNameOrEmail) ??
+					await userManager.FindByEmailAsync(model.UserNameOrEmail);
+
+				if (user == null)
+				{
+					return Results.NotFound("User not found.");
+				}
+
+				var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
+
+				if (result.Succeeded)
+				{
+					return Results.Ok("User logged in successfully.");
+				}
+
+				return Results.BadRequest("Invalid login attempt.");
+
+			}).WithSummary("Logs in a user using Name or Email and Password");
 		}
 	}
 }

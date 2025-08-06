@@ -24,6 +24,13 @@ builder.Services.Configure<IdentityOptions>(options =>
 	options.Password.RequireDigit = true;
 	options.Password.RequiredLength = 6;
 	options.Password.RequireNonAlphanumeric = false;
+	options.User.RequireUniqueEmail = true;
+});
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+	options.ExpireTimeSpan = TimeSpan.FromDays(14);
+	options.SlidingExpiration = true;
 });
 
 var app = builder.Build();
