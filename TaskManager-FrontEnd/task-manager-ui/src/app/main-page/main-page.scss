@@ -1,0 +1,36 @@
+.nav-link {
+    padding-top: 15px;
+    margin-left: 20px;
+    font-size: 20px;
+
+    color: #a259ff;
+
+    cursor: pointer;
+}
+
+.navbar-brand {
+    color: #a259ff;
+    font-size: 30px;
+}
+
+.search_bar {
+    margin-left: 20%;
+    width: 40%  ;
+}
+
+@media screen and (max-width: 768px) {
+    .nav-link {
+        margin-left: 10px;
+        font-size: 18px;
+    }
+
+    .navbar-brand {
+        font-size: 24px;
+    }
+
+    .search_bar {
+        margin-left: 10%;
+        width: 80%;
+    }
+    
+}

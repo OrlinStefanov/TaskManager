@@ -14,7 +14,7 @@ export class Startup implements OnInit {
 
     ngOnInit(): void {
       setTimeout(() => {
-        this.router.navigate(['/login']);
+        this.router.navigate(['/dashboard']);
       }, 3000);
     }
 }

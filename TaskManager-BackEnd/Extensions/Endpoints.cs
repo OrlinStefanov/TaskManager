@@ -69,12 +69,9 @@ namespace TaskManager.Extensions
 				[FromBody] ApplicationUserDTO model) =>
 			{
 				//check for incomplete user information
-				if (string.IsNullOrEmpty(model.User_Name) ||
-					string.IsNullOrEmpty(model.User_Email) ||
-					string.IsNullOrEmpty(model.User_Password))
-				{
-					return Results.BadRequest("User information is incomplete.");
-				}
+				if (string.IsNullOrEmpty(model.User_Email)) return Results.BadRequest("Email is required.");
+				if (string.IsNullOrEmpty(model.User_Name)) return Results.BadRequest("Username is required.");
+				if (string.IsNullOrEmpty(model.User_Password)) return Results.BadRequest("Password is required.");
 
 				//check for existing email
 				var existingEmail = await userManager.FindByEmailAsync(model.User_Email);
@@ -135,6 +132,25 @@ namespace TaskManager.Extensions
 				return Results.BadRequest("Invalid login attempt.");
 
 			}).WithSummary("Logs in a user using Name or Email and Password");
+
+			//get current user info by remember me cookie
+			app.MapGet("/current-user", async (
+				UserManager<ApplicationUser> userManager,
+				SignInManager<ApplicationUser> signInManager) =>
+			{
+				var user = await userManager.GetUserAsync(signInManager.Context.User);
+				if (user == null)
+				{
+					return Results.NotFound("User not found.");
+				}
+				var userInfo = new
+				{
+					user.Id,
+					user.UserName,
+					user.Email
+				};
+				return Results.Ok(userInfo);
+			}).WithSummary("Returns current user's information based on the remember me cookie");
 		}
 	}
 }
