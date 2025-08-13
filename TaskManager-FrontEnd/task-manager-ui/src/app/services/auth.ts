@@ -15,6 +15,11 @@ export interface RegisterRequest {
   user_Password: string;
 }
 
+export interface User {
+  userNameOrEmail: string;
+  role : "Admin" | "User";
+}
+
 @Injectable({
   providedIn: 'root'
 })

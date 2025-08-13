@@ -16,10 +16,12 @@
         </ul>
         <form class="d-flex search_bar" role="search">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-          <button class="btn btn-outline-success" type="submit">Search</button>
+          <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Create</button>
         </form>
         <div class="col-md d-flex justify-content-end">
-            <img src="/src/app/Images/profile.png" alt="Profile photo" width="40" height="40"/>
+            <a>
+              <img src="assets/Images/profile.png" alt="Profile photo" width="40" height="40"/>
+            </a>
         </div>
       </div>
     </div>
@@ -27,7 +29,77 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-3">
-            <p></p>
+        <div class="col-md-12">
+            <h3>{{userName}}'s sessions</h3>
+            <hr>
         </div>
+        <div class="col-md-12 text-center" >
+          <h4 style="margin-top: 20%;" class="text-secondary">You don't have any sessions. Once you create one it will be displayed here.</h4>
+        </div>
+        <div class="col-md-12" style="margin-top: 20%;">
+          <h3>Other's sessions</h3>
+          <hr>
+        </div>
+    </div>    
+</div>
+
+<!-- Modal -->
+<div class="modal fade modal" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Create session</h1>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="sessionName" class="form-label">Session Name</label>
+            <input type="text" class="form-control" id="sessionName" placeholder="Enter session name" required>
+          </div>
+          <div class="mb-3">
+            <label for="sessionDescription" class="form-label">Session Description</label>
+            <textarea class="form-control" id="sessionDescription" rows="3" placeholder="Enter session description"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="sessionUsers" class="form-label">Participants</label>
+            <div class="input-group mb-3">
+                <div *ngFor="let p of participants" class="d-flex align-items-center rounded mb-3 participant" >
+                  <div class="me-3 bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center"
+                      style="width: 32px; height: 32px; margin-left: 20px;">
+                    {{p.userName?.charAt(0).toUpperCase()}}
+                  </div>
+                  <div class="flex-grow-1">
+                    <div>{{p.userName}}</div>
+                    <small class="text" style="color: #b4b1b1;">{{p.userEmail}}</small>
+                  </div>
+                  <span class="badge bg-primary" style="margin-right: 20px;">{{p.role}}</span>
+                </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="addingUsers" class="form-label">Add Users</label>
+            <div class="row g-2">
+              <div class="col-md"> 
+                <input type="text" class="form-control" id="addingUsers" placeholder="Enter user email or username" required [(ngModel)]="user_data.userNameOrEmail" name="userNameOrEmail">
+                <div class="input-group mb-3">
+                  <select class="form-select" id="inputGroupSelect01" [(ngModel)]="user_data.role" name="role">
+                    <option selected disabled>Choose role</option>
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+
+            <button type="button" class="btn btn-outline-primary" style="margin-left: 88%;" (click)="addParticipant()">Add User</button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-outline-primary">Create</button>
+      </div>
+    </div>
+  </div>
 </div>
