@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.Data;
 using TaskManager.DTO;
 using TaskManager.Models;
 
@@ -11,56 +12,10 @@ namespace TaskManager.Extensions
 		//map endpoints for the application
 		public static void MapEndpoints(this WebApplication app)
 		{
-			//MapUserEndpointsTestSeeder(app); // This method maps user-related endpoints for testing and seeding purposes.
 			UserRegisterEnpoints(app); // This method maps user registration and login endpoints.
+			SessionsEndpoints(app); // This method maps session-related endpoints.
 		}
 
-		public static void MapUserEndpointsTestSeeder(this WebApplication app)
-		{
-			//GET USER'S INFORMATION
-			app.MapGet("/users/info", async (UserManager<ApplicationUser> userManager) =>
-			{
-				var users = await userManager.Users.ToListAsync();
-				var user_Info = users.Select(u => new
-				{
-					u.Id,
-					u.UserName,
-					u.Email,
-					u.PasswordHash
-				}).ToList();
-
-				return Results.Ok(user_Info);
-			}).WithSummary("Returns every user info");
-
-			//POST USER INFORMATION
-			app.MapPost("/users", async (
-				UserManager<ApplicationUser> userManager,
-				[FromBody] ApplicationUserDTO model) =>
-			{
-				var user_info = new ApplicationUser
-				{
-					UserName = model.User_Name,
-					Email = model.User_Email,
-					PasswordHash = model.User_Password
-				};
-
-				if (string.IsNullOrEmpty(user_info.UserName) ||
-					string.IsNullOrEmpty(user_info.Email) ||
-					string.IsNullOrEmpty(user_info.PasswordHash))
-				{
-					return Results.BadRequest("User information is incomplete.");
-				}
-
-				var result = await userManager.CreateAsync(user_info, model.User_Password);
-
-				if (result.Succeeded)
-				{
-					return Results.Created($"/users/{user_info.Id}", user_info);
-				}
-
-				return Results.BadRequest(result.Errors.Select(e => e.Description));
-			}).WithSummary("Creates user using Name, Password and Email");
-		}
 		public static void UserRegisterEnpoints(this WebApplication app)
 		{
 			//register user
@@ -151,6 +106,89 @@ namespace TaskManager.Extensions
 				};
 				return Results.Ok(userInfo);
 			}).WithSummary("Returns current user's information based on the remember me cookie");
+
+			//returns user if exists
+			app.MapGet("/users/{userNameOrEmail}", async (
+				UserManager<ApplicationUser> userManager,
+				string userNameOrEmail) =>
+			{
+				var user = await userManager.FindByNameAsync(userNameOrEmail) ?? await userManager.FindByEmailAsync(userNameOrEmail);
+
+				if (user is null)
+				{
+					return Results.NotFound("User not found check input data");
+				}
+
+				var result = new
+				{
+					user.UserName,
+					user.Email,
+				};
+
+				return Results.Ok(result);
+			}).WithSummary("Gives the user searched by userNameOrEmail and returns his name and email if valid");
+		}
+		public static void SessionsEndpoints(this WebApplication app)
+		{
+			//create session
+			app.MapPost("/sessions", async (
+				MinimalSessionDTO model,
+				ApplicationDbContext db) =>
+			{
+				if (string.IsNullOrEmpty(model.Title) || string.IsNullOrEmpty(model.Description)) 
+				{
+					return Results.BadRequest("All fields should be fill");
+				}
+
+				var session = new Session
+				{
+					Id = Guid.NewGuid(),
+					Title = model.Title,
+					Description = model.Description,
+					UserSessions = new List<UserSession>(),
+				};
+
+				if (model.UserSessions == null || model.UserSessions.Count == 0)
+				{
+					return Results.BadRequest("At least one user session is required.");
+				}
+
+				foreach (var userSession in model.UserSessions)
+				{
+					var user = await db.Users.FindAsync(userSession.UserName);
+					if (user != null)
+					{
+						var userSessionNew = new UserSession
+						{
+							SessionId = session.Id,
+							SessionName = session.Title,
+							UserName = user.UserName,
+							User = user,
+							Role = userSession.Role ?? "User"
+						};
+
+						session.UserSessions.Add(userSessionNew);
+						await db.UserSessions.AddAsync(userSessionNew);
+					}
+				}
+
+				db.Sessions.Add(session);
+				await db.SaveChangesAsync();
+
+				return Results.Created($"/sessions/{session.Id}", session);	
+			}).WithSummary("Creates session in which can participate people");
+
+			//get session request
+			app.MapGet("/sessions/{id}", async (
+				Guid id, ApplicationDbContext db) =>
+				{
+					var session = await db.Sessions
+						.Include(s => s.UserSessions)
+						.ThenInclude(us => us.User)
+						.FirstOrDefaultAsync(s => s.Id == id);
+
+					return session != null ? Results.Ok(session) : Results.NotFound();
+				});
 		}
 	}
 }

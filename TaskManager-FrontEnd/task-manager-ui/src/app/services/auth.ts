@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
+//for the login and register requests
 export interface LoginRequest {
   userNameOrEmail: string;
   password: string;
@@ -18,6 +19,22 @@ export interface RegisterRequest {
 export interface User {
   userNameOrEmail: string;
   role : "Admin" | "User";
+}
+
+//for the session requests
+export interface UserSession {
+  sessionName: string;
+
+  userName: string;
+
+  role: "Admin" | "User" | "Creator";
+}
+
+export interface Session {
+  title: string;
+  description: string;
+
+  userSessions: UserSession[];
 }
 
 @Injectable({
@@ -55,5 +72,15 @@ export class Auth {
   //doesn't work yet
   logout(): Observable<any> {
     return this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true });
+  }
+  
+  //checks if added user exists and returns their data
+  checkUserExists(userNameOrEmail: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/users/${userNameOrEmail}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  //create session
+  createSession(session: Session): Observable<any> {
+    return this.http.post(`${this.apiUrl}/sessions`, session, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
   }
 }

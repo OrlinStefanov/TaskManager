@@ -17,14 +17,20 @@ namespace TaskManager.Data
 		{
 			base.OnModelCreating(builder);
 
-			// Configure composite key for UserSession (many-to-many)
-			builder.Entity<UserSession>()
-				.HasKey(us => new { us.UserId, us.SessionId });
+			builder.Entity<ApplicationUser>()
+				.HasMany(u => u.UserSessions)
+				.WithOne(us => us.User)
+				.HasForeignKey(us => us.UserName);
 
+			builder.Entity<ApplicationUser>()
+				.HasMany(u => u.AssignedTasks)
+				.WithOne(t => t.AssignedToUser)
+				.HasForeignKey(t => t.AssignedToUserId)
+				.OnDelete(DeleteBehavior.SetNull);
+
+			// UserSession - composite key
 			builder.Entity<UserSession>()
-				.HasOne(us => us.User)
-				.WithMany(u => u.UserSessions)
-				.HasForeignKey(us => us.UserId);
+				.HasKey(us => new { us.UserName, us.SessionId });
 
 			builder.Entity<UserSession>()
 				.HasOne(us => us.Session)

@@ -29,7 +29,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-	options.ExpireTimeSpan = TimeSpan.FromDays(14); 
+	options.ExpireTimeSpan = TimeSpan.FromDays(1); 
 	options.SlidingExpiration = true;               
 	options.LoginPath = "/login";           
 	options.AccessDeniedPath = "/dashboard"; 

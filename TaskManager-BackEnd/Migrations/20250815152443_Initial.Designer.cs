@@ -12,8 +12,8 @@ using TaskManager.Data;
 namespace TaskManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250805110540_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250815152443_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -239,7 +239,10 @@ namespace TaskManager.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -262,7 +265,7 @@ namespace TaskManager.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("SessionId")
+                    b.Property<Guid?>("SessionId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Title")
@@ -285,7 +288,7 @@ namespace TaskManager.Migrations
                     b.Property<Guid>("SessionId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Role")
+                    b.Property<string>("SessionName")
                         .HasColumnType("text");
 
                     b.HasKey("UserId", "SessionId");
@@ -349,18 +352,15 @@ namespace TaskManager.Migrations
             modelBuilder.Entity("TaskManager.Models.TaskItem", b =>
                 {
                     b.HasOne("TaskManager.Models.ApplicationUser", "AssignedToUser")
-                        .WithMany()
-                        .HasForeignKey("AssignedToUserId");
+                        .WithMany("AssignedTasks")
+                        .HasForeignKey("AssignedToUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TaskManager.Models.Session", "Session")
+                    b.HasOne("TaskManager.Models.Session", null)
                         .WithMany("Tasks")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SessionId");
 
                     b.Navigation("AssignedToUser");
-
-                    b.Navigation("Session");
                 });
 
             modelBuilder.Entity("TaskManager.Models.UserSession", b =>
@@ -384,6 +384,8 @@ namespace TaskManager.Migrations
 
             modelBuilder.Entity("TaskManager.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("AssignedTasks");
+
                     b.Navigation("UserSessions");
                 });
 

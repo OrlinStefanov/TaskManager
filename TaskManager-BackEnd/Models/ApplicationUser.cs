@@ -10,5 +10,6 @@ namespace TaskManager.Models
 		public string? User_Password { get; set; }
 
 		public ICollection<UserSession>? UserSessions { get; set; }
+		public ICollection<TaskItem>? AssignedTasks { get; set; }
 	}
 }

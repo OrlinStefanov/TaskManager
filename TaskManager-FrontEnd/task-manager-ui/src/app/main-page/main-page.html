@@ -45,6 +45,9 @@
 
 <!-- Modal -->
 <div class="modal fade modal" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div *ngIf="message" class="text-center" [ngClass]="'alert alert-' + alertType + ' d-flex align-items-center'" role="alert" style="width: 50%; margin: 0 auto; margin-top: 20px;">
+      {{ message }}
+    </div>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -54,16 +57,16 @@
         <form>
           <div class="mb-3">
             <label for="sessionName" class="form-label">Session Name</label>
-            <input type="text" class="form-control" id="sessionName" placeholder="Enter session name" required>
+            <input type="text" class="form-control" id="sessionName" placeholder="Enter session name" [(ngModel)]="session.title" name="title" required>
           </div>
           <div class="mb-3">
             <label for="sessionDescription" class="form-label">Session Description</label>
-            <textarea class="form-control" id="sessionDescription" rows="3" placeholder="Enter session description"></textarea>
+            <textarea class="form-control" id="sessionDescription" rows="3" placeholder="Enter session description" [(ngModel)]="session.description" name="description"></textarea>
           </div>
           <div class="mb-3">
             <label for="sessionUsers" class="form-label">Participants</label>
             <div class="input-group mb-3">
-                <div *ngFor="let p of participants" class="d-flex align-items-center rounded mb-3 participant" >
+                <div *ngFor="let p of participants" class="d-flex align-items-center rounded mb-3 participant">
                   <div class="me-3 bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center"
                       style="width: 32px; height: 32px; margin-left: 20px;">
                     {{p.userName?.charAt(0).toUpperCase()}}
@@ -73,6 +76,7 @@
                     <small class="text" style="color: #b4b1b1;">{{p.userEmail}}</small>
                   </div>
                   <span class="badge bg-primary" style="margin-right: 20px;">{{p.role}}</span>
+                  <a style="color: red; font-size: medium;" (click)="removeParticipant(p)"> <bold>X</bold></a>
                 </div>
             </div>
           </div>
@@ -90,15 +94,13 @@
                 </div>
               </div>
             </div>
-
-
             <button type="button" class="btn btn-outline-primary" style="margin-left: 88%;" (click)="addParticipant()">Add User</button>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-outline-primary">Create</button>
+        <button type="button" class="btn btn-outline-primary" (click)="createSession()">Create</button>
       </div>
     </div>
   </div>

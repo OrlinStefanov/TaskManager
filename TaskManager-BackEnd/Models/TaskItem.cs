@@ -7,10 +7,8 @@
 		public string? Description { get; set; }
 		public DateTime DueDate { get; set; }
 
-		public Guid SessionId { get; set; }
-		public Session? Session { get; set; }
+		public string? AssignedToUserId { get; set; }
 
-		public string? AssignedToUserId { get; set; }  // may be removed i don't need it
 		public ApplicationUser? AssignedToUser { get; set; }
 	}
 }
