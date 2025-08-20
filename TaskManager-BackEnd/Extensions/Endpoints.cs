@@ -155,27 +155,52 @@ namespace TaskManager.Extensions
 
 				foreach (var userSession in model.UserSessions)
 				{
-					var user = await db.Users.FindAsync(userSession.UserName);
+					var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == userSession.UserName);
+
+					if (user == null)
+					{
+						return Results.BadRequest($"User with username {userSession.UserName} does not exist.");
+					}
+
 					if (user != null)
 					{
 						var userSessionNew = new UserSession
 						{
 							SessionId = session.Id,
 							SessionName = session.Title,
-							UserName = user.UserName,
+							UserId = user.Id,
 							User = user,
 							Role = userSession.Role ?? "User"
 						};
 
+						if (userSessionNew is null)
+						{
+							return Results.BadRequest("User session cannot be null");
+						}
+
 						session.UserSessions.Add(userSessionNew);
-						await db.UserSessions.AddAsync(userSessionNew);
+						db.UserSessions.Add(userSessionNew);
 					}
 				}
 
 				db.Sessions.Add(session);
 				await db.SaveChangesAsync();
 
-				return Results.Created($"/sessions/{session.Id}", session);	
+				var response = new MinimalSessionDTO
+				{
+					Id = session.Id,
+					Title = session.Title,
+					Description = session.Description,
+					UserSessions = session.UserSessions.Select(us => new MinimalUserSessionDTO
+					{
+						SessionId = us.SessionId,
+						SessionName = us.SessionName,
+						UserName = us.User?.UserName ?? "",
+						Role = us.Role ?? "User"
+					}).ToList()
+				};
+
+				return Results.Created($"/sessions/{session.Id}", response);	
 			}).WithSummary("Creates session in which can participate people");
 
 			//get session request

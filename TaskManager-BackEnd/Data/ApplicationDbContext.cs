@@ -20,7 +20,7 @@ namespace TaskManager.Data
 			builder.Entity<ApplicationUser>()
 				.HasMany(u => u.UserSessions)
 				.WithOne(us => us.User)
-				.HasForeignKey(us => us.UserName);
+				.HasForeignKey(us => us.UserId);
 
 			builder.Entity<ApplicationUser>()
 				.HasMany(u => u.AssignedTasks)
@@ -30,7 +30,7 @@ namespace TaskManager.Data
 
 			// UserSession - composite key
 			builder.Entity<UserSession>()
-				.HasKey(us => new { us.UserName, us.SessionId });
+				.HasKey(us => new { us.UserId, us.SessionId });
 
 			builder.Entity<UserSession>()
 				.HasOne(us => us.Session)

@@ -31,8 +31,6 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
 	options.ExpireTimeSpan = TimeSpan.FromDays(1); 
 	options.SlidingExpiration = true;               
-	options.LoginPath = "/login";           
-	options.AccessDeniedPath = "/dashboard"; 
 	options.Cookie.HttpOnly = true;                 
 	options.Cookie.SameSite = SameSiteMode.None;
 	options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
