@@ -83,4 +83,15 @@ export class Auth {
   createSession(session: Session): Observable<any> {
     return this.http.post(`${this.apiUrl}/sessions`, session, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
   }
+
+  //get sessions for a user
+  getUserSessions(userName: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/sessions/${userName}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  //get sessions where user is a participant
+  getParticipateSessions(userName: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/sessions/participant/${userName}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
 }

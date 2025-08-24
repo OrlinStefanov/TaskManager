@@ -203,17 +203,88 @@ namespace TaskManager.Extensions
 				return Results.Created($"/sessions/{session.Id}", response);	
 			}).WithSummary("Creates session in which can participate people");
 
-			//get session request
-			app.MapGet("/sessions/{id}", async (
-				Guid id, ApplicationDbContext db) =>
-				{
-					var session = await db.Sessions
-						.Include(s => s.UserSessions)
-						.ThenInclude(us => us.User)
-						.FirstOrDefaultAsync(s => s.Id == id);
+			//get sessions list based in the creator
+			app.MapGet("/sessions/{userName}", async
+				(string userName, ApplicationDbContext db) =>
+			{
+				var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
 
-					return session != null ? Results.Ok(session) : Results.NotFound();
-				});
+				if (user == null)
+				{
+					return Results.NotFound("User not found.");
+				}
+
+				var sessionIds = await db.UserSessions
+					.Where(us => us.UserId == user.Id)
+					.Select(us => us.SessionId)
+					.ToListAsync();
+
+				if (sessionIds is null) return Results.BadRequest("You don't have any sessions. Once you create one it will be displayed here." + user.Id);
+
+				var sessions = await db.Sessions.Where(s => sessionIds.Contains(s.Id))
+					.Include(s => s.UserSessions)
+					.ThenInclude(us => us.User)
+					.ToListAsync();
+
+				return Results.Ok(sessions.Select(s => new MinimalSessionDTO
+				{
+					Id = s.Id,
+					Title = s.Title,
+					Description = s.Description,
+					UserSessions = s.UserSessions.Select(us => new MinimalUserSessionDTO
+					{
+						SessionId = us.SessionId,
+						SessionName = us.SessionName,
+						UserName = us.User?.UserName ?? "",
+						Role = us.Role ?? "User"
+					}).ToList()
+				}).Reverse());
+			});
+
+			//get session if user is part of it
+			app.MapGet("/sessions/participant/{userName}", async(string userName, ApplicationDbContext db) =>
+			{
+				var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+
+				if (user == null)
+				{
+					return Results.NotFound("User not found.");
+				}
+
+				var userSessions = await db.UserSessions
+					.Where(us => us.UserId == user.Id)
+					.Where(us => us.Role == "User" || us.Role == "Admin")
+					.ToListAsync();
+
+				if (userSessions == null || userSessions.Count == 0)
+				{
+					return Results.NotFound("You don't participate in any sessions. Once someone invites you sessions will appear here.");
+				}
+
+				var sessionIds = userSessions.Select(us => us.SessionId).ToList();
+				var sessions = await db.Sessions
+					.Where(s => sessionIds.Contains(s.Id))
+					.Include(s => s.UserSessions)
+					.ThenInclude(us => us.User)
+					.ToListAsync();
+
+				var result = sessions.Select(s => new MinimalSessionDTO
+				{
+					Id = s.Id,
+					Title = s.Title,
+					Description = s.Description,
+					UserSessions = s.UserSessions.Select(us => new MinimalUserSessionDTO
+					{
+						SessionId = us.SessionId,
+						SessionName = us.SessionName,
+						UserName = us.User?.UserName ?? "",
+						Role = us.Role ?? "User"
+					}).ToList()
+				}).Reverse();
+
+				return Results.Ok(result);
+
+			}).WithSummary("Returns session if user is part of it");
 		}
 	}
 }

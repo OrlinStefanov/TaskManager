@@ -37,6 +37,16 @@ export class MainPage {
     userSessions: []
   }
 
+  //to load sessions
+  load_Sessions: Session[] = [];
+
+  //load sessiosn if you participate in any
+  participate_Sessions: Session[] = [];
+  participate_loading: boolean = false;
+
+  is_loading: boolean = false;
+
+  //to store user sessions
   userSessions: UserSession[] = [];
 
 
@@ -62,6 +72,9 @@ export class MainPage {
           userName: user.userName || '',
           role: "Creator"
         });
+
+        this.getCurrentUserSessions();
+        this.getParticipateSessions();
       },
       error: () => {
         this.userName = null;
@@ -145,13 +158,45 @@ export class MainPage {
 
     this.session.userSessions = this.userSessions;
 
-    console.log(this.participants);
-    console.log(this.session);
     this.authService.createSession(this.session).subscribe({
       next: () => {
         showAlert(this, 'success', 'Session created successfully');
+        this.getCurrentUserSessions();
       },
       error: (err) => showAlert(this, 'danger', err.error || 'Failed to create session')
     });
   }
+
+  public getCurrentUserSessions() {
+    this.authService.getUserSessions(this.userName).subscribe({
+      next: (sessions) => {
+        console.log(sessions);
+        this.load_Sessions = sessions;
+        this.is_loading = true;
+
+        showAlert(this, 'success', 'Sessions retrieved successfully');
+      },
+      error: (err) => {
+        showAlert(this, 'danger', err.error || 'Failed to retrieve sessions')
+        this.is_loading = false;
+      }
+    }); 
+  }
+
+  public getParticipateSessions() {
+    this.authService.getParticipateSessions(this.userName).subscribe({
+      next: (sessions) => {
+        console.log(sessions);
+        this.participate_Sessions = sessions;
+        this.participate_loading = true;
+
+        showAlert(this, 'success', 'Participate Sessions retrieved successfully');
+      },
+      error: (err) => {
+        showAlert(this, 'danger', err.error || 'Failed to retrieve participate sessions')
+        this.participate_loading = false;
+      }
+    }); 
+  }
+
 }

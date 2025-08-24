@@ -33,13 +33,47 @@
             <h3>{{userName}}'s sessions</h3>
             <hr>
         </div>
-        <div class="col-md-12 text-center" >
-          <h4 style="margin-top: 20%;" class="text-secondary">You don't have any sessions. Once you create one it will be displayed here.</h4>
+        <div class="col-md-12 text-center">
+          <h4 *ngIf="!is_loading" style="margin-top: 20%;" class="text-secondary">You don't have any sessions. Once you create one it will be displayed here.</h4>
+          <!--If there are sessions-->
+          <div *ngIf="is_loading" class="row row-cols-md-5 g-5" style="margin-top: 20px;">
+            <div *ngFor="let l_session of load_Sessions" class="col">
+              <a [routerLink]="['/sessions', l_session.id]" style="text-decoration: none; color: inherit;">
+                <div class="card">
+                  <span class="imgD"></span>
+                  <div class="card-body">
+                    <h5 class="card-title">{{l_session.title}}</h5>
+                    <p class="card-text">{{l_session.description}}</p>
+                  </div>
+                </div>
+              </a>
+  
+            </div>
+          </div> 
         </div>
         <div class="col-md-12" style="margin-top: 20%;">
           <h3>Other's sessions</h3>
           <hr>
         </div>
+        <div class="col-md-12 text-center">
+          <h4 *ngIf="!participate_loading" style="margin-top: 20%;" class="text-secondary">You don't participate in any sessions. Once someone invites you sessions will appear here.</h4>
+          <!--If there are sessions-->
+          <div *ngIf="participate_loading" class="row row-cols-md-5 g-5" style="margin-top: 20px;">
+            <div *ngFor="let p_session of participate_Sessions" class="col">
+              <a [routerLink]="['/sessions', p_session.id]" style="text-decoration: none; color: inherit;">
+                <div class="card">
+                  <span class="imgD"></span>
+                  <div class="card-body">
+                    <h5 class="card-title">{{p_session.title}}</h5>
+                    <p class="card-text">{{p_session.description}}</p>
+                  </div>
+                </div>
+              </a>  
+            </div>
+          </div> 
+        </div>
+        <div style="margin-bottom: 250px;">
+          </div>
     </div>    
 </div>
 
