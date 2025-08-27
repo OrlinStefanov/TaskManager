@@ -174,7 +174,6 @@ export class MainPage {
   public getCurrentUserSessions() {
     this.authService.getUserSessions(this.userName).subscribe({
       next: (sessions) => {
-        console.log(sessions);
         this.load_Sessions = sessions;
         this.is_loading = true;
 
@@ -190,7 +189,6 @@ export class MainPage {
   public getParticipateSessions() {
     this.authService.getParticipateSessions(this.userName).subscribe({
       next: (sessions) => {
-        console.log(sessions);
         this.participate_Sessions = sessions;
         this.participate_loading = true;
 
@@ -203,20 +201,34 @@ export class MainPage {
     }); 
   }
 
-  public deleteSession(sessionId: number) {
+  public deleteSession(sessionId: number, event :MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
     this.authService.deleteSession(sessionId).subscribe({
       next: () => {
         showAlert(this, 'success', 'Session deleted successfully');
         this.getCurrentUserSessions();
+        this.getDeletedSessions();
       },
       error: (err) => showAlert(this, 'danger', err.error || 'Failed to delete session')
+    });
+  }
+
+  public hardDeleteSession(sessionId: number, event :MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.authService.hardDeleteSession(sessionId).subscribe({
+      next: () => {
+        showAlert(this, 'success', 'Session permanently deleted successfully');
+        this.getDeletedSessions();
+      },
+      error: (err) => showAlert(this, 'danger', err.error || 'Failed to permanently delete session')
     });
   }
 
   public getDeletedSessions() {
     this.authService.deleteSessionByCreator(this.userName).subscribe({
       next: (sessions) => {
-        console.log(sessions);
         this.archive_Sessions = sessions;
         this.archive_loading = true;
         showAlert(this, 'success', 'Deleted sessions retrieved successfully');
@@ -229,4 +241,16 @@ export class MainPage {
     });
   }
 
+  public restoreSession(sessionId: number, event :MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.authService.restoreSession(sessionId).subscribe({
+      next: () => {
+        showAlert(this, 'success', 'Session restored successfully');
+        this.getDeletedSessions();
+        this.getCurrentUserSessions();
+      },
+      error: (err) => showAlert(this, 'danger', err.error || 'Failed to restore session')
+    });
+  }
 }

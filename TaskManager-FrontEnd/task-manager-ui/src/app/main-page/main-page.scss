@@ -35,6 +35,19 @@ hr {
     box-shadow: 0 4px 8px rgba(192, 48, 180, 0.2);
 }
 
+.card #btn_delete {
+    display: none;
+}
+
+.card:hover #btn_delete {
+    display: block;
+}
+
+.inactive {
+  opacity: 0.5;               /* make transparent */
+  filter: grayscale(30%);     /* slightly gray */    /* prevent interactions if needed */
+}
+
 .imgD {
 
     border-radius: 8px 8px 0 0;

@@ -99,8 +99,18 @@ export class Auth {
     return this.http.delete(`${this.apiUrl}/sessions/${sessionId}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
   }
 
+  //hard delete session by id
+  hardDeleteSession(sessionId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/sessions/hard-delete/${sessionId}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
   //return soft delete session by creator
   deleteSessionByCreator(userName: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/sessions/deleted/${userName}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  //restore deleted session by id
+  restoreSession(sessionId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/sessions/restore/${sessionId}`, {}, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
   }
 }

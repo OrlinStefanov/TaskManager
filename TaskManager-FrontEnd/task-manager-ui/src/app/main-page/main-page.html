@@ -46,7 +46,7 @@
                     <p class="card-text">{{l_session.description}}</p>
                   </div>
                   <div class="card-footer text-end">
-                    <a (click)="deleteSession(l_session.id)" style="text-decoration: none; color: inherit;" title="Delete session">
+                    <a (click)="deleteSession(l_session.id, $event)" id="btn_delete" style="text-decoration: none; color: inherit;" title="Delete session">
                       <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
                     </a>
                   </div>
@@ -87,14 +87,17 @@
           <div *ngIf="archive_loading" class="row row-cols-md-5 g-5" style="margin-top: 20px;">
             <div *ngFor="let a_session of archive_Sessions" class="col">
               <a style="text-decoration: none; color: inherit;">
-                <div class="card">
+                <div class="inactive card">
                   <span class="imgD"></span>
                   <div class="card-body">
                     <h5 class="card-title">{{a_session.title}}</h5>
                     <p class="card-text">{{a_session.description}}</p>
                   </div>
-                  <div class="card-footer text-end">
-                    <a style="text-decoration: none; color: inherit;" title="Delete session">
+                  <div class="card-footer d-flex justify-content-between mt-2">
+                    <a (click)="restoreSession(a_session.id, $event)" id="btn_restore" id="btn_delete" style="text-decoration: none; color: inherit; margin-right: 10px;" title="Restore session">
+                      <img src="assets/Images/undo.png" alt="Profile photo" width="20" height="20"/>
+                    </a>
+                    <a (click)="hardDeleteSession(a_session.id, $event)" id="btn_delete" style="text-decoration: none; color: inherit;" title="Delete session">
                       <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
                     </a>
                   </div>

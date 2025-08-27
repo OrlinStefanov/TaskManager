@@ -230,7 +230,7 @@ namespace TaskManager.Extensions
 
 				if (sessions is null) return Results.NotFound("There aren't any existing sessions");
 
-				return Results.Ok(sessions.Select(s => new MinimalSessionDTO
+				var result = sessions.Select(s => new MinimalSessionDTO
 				{
 					Id = s.Id,
 					Title = s.Title,
@@ -242,7 +242,11 @@ namespace TaskManager.Extensions
 						UserName = us.User?.UserName ?? "",
 						Role = us.Role ?? "User"
 					}).ToList()
-				}).Reverse());
+				}).Reverse();
+
+				if (result is null || !result.Any()) return Results.NotFound("There aren't any existing sessions");
+
+				return Results.Ok(result);
 			}).WithSummary("Returns all sessions for user who is a creator");
 
 			//get session if user is part of it
@@ -291,6 +295,11 @@ namespace TaskManager.Extensions
 					}).ToList()
 				}).Reverse();
 
+				if (result == null || !result.Any())
+				{
+					return Results.NotFound("No sessions found for the user.");
+				}
+
 				return Results.Ok(result);
 
 			}).WithSummary("Returns session if user is part of it");
@@ -305,8 +314,13 @@ namespace TaskManager.Extensions
 					return Results.NotFound("User not found.");
 				}
 
+				var creator = await db.UserSessions
+					.IgnoreQueryFilters()
+					.FirstOrDefaultAsync(us => us.UserId == user.Id && us.Role == "Creator");
+
 				var sessionIds = await db.UserSessions
-					.Where(us => us.UserId == user.Id && us.Role == "Creator")
+					.IgnoreQueryFilters()
+					.Where(us => us.UserId == creator.UserId)
 					.Select(us => us.SessionId)
 					.ToListAsync();
 
@@ -327,20 +341,26 @@ namespace TaskManager.Extensions
 					return Results.NotFound("There aren't any existing sessions.");
 				}
 
-				return Results.Ok(
-					sessions.Select(s => new MinimalSessionDTO
+				var result = sessions.Select(s => new MinimalSessionDTO
+				{
+					Id = s.Id,
+					Title = s.Title,
+					Description = s.Description,
+					UserSessions = s.UserSessions.Select(us => new MinimalUserSessionDTO
 					{
-						Id = s.Id,
-						Title = s.Title,
-						Description = s.Description,
-						UserSessions = s.UserSessions.Select(us => new MinimalUserSessionDTO
-						{
-							SessionId = us.SessionId,
-							SessionName = us.SessionName,
-							UserName = us.User?.UserName ?? "",
-							Role = us.Role ?? "User"
-						}).ToList()
-					}).Reverse());
+						SessionId = us.SessionId,
+						SessionName = us.SessionName,
+						UserName = us.User?.UserName ?? "",
+						Role = us.Role ?? "User"
+					}).ToList()
+				}).Reverse();
+
+				if (result == null || !result.Any())
+				{
+					return Results.NotFound("There aren't any existing sessions.");
+				}
+
+				return Results.Ok(result);
 			}).WithSummary("Returns deleted sessions of the creator");
 			
 			//soft delete session
@@ -358,6 +378,39 @@ namespace TaskManager.Extensions
 				await db.SaveChangesAsync();
 				return Results.Ok("Session deleted successfully.");
 			}).WithSummary("Soft deletes a session by its ID" );
+
+			//hard delete session
+			app.MapDelete("/sessions/hard-delete/{sessionId}", async (Guid sessionId, ApplicationDbContext db) =>
+			{
+				var session = await db.Sessions
+					.IgnoreQueryFilters()
+					.Include(s => s.UserSessions)
+					.FirstOrDefaultAsync(s => s.Id == sessionId);
+				if (session == null)
+				{
+					return Results.NotFound("Session not found.");
+				}
+				db.UserSessions.RemoveRange(session.UserSessions);
+				db.Sessions.Remove(session);
+				await db.SaveChangesAsync();
+				return Results.Ok("Session permanently deleted.");
+			}).WithSummary("Permanently deletes a session by its ID");
+
+			//restore deleted session
+			app.MapPut("/sessions/restore/{sessionId}", async (Guid sessionId, ApplicationDbContext db) =>
+			{
+				var session = await db.Sessions
+					.IgnoreQueryFilters()
+					.FirstOrDefaultAsync(s => s.Id == sessionId);
+				if (session == null)
+				{
+					return Results.NotFound("Session not found.");
+				}
+				session.IsDeleted = false;
+				db.Sessions.Update(session);
+				await db.SaveChangesAsync();
+				return Results.Ok("Session restored successfully.");
+			}).WithSummary("Restores a soft-deleted session by its ID");
 		}
 	}
 }
