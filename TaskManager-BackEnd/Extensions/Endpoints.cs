@@ -145,6 +145,7 @@ namespace TaskManager.Extensions
 					Id = Guid.NewGuid(),
 					Title = model.Title,
 					Description = model.Description,
+					IsDeleted = false,
 					UserSessions = new List<UserSession>(),
 				};
 
@@ -216,6 +217,7 @@ namespace TaskManager.Extensions
 
 				var sessionIds = await db.UserSessions
 					.Where(us => us.UserId == user.Id)
+					.Where(us => us.Role == "Creator")
 					.Select(us => us.SessionId)
 					.ToListAsync();
 
@@ -225,6 +227,8 @@ namespace TaskManager.Extensions
 					.Include(s => s.UserSessions)
 					.ThenInclude(us => us.User)
 					.ToListAsync();
+
+				if (sessions is null) return Results.NotFound("There aren't any existing sessions");
 
 				return Results.Ok(sessions.Select(s => new MinimalSessionDTO
 				{
@@ -239,7 +243,7 @@ namespace TaskManager.Extensions
 						Role = us.Role ?? "User"
 					}).ToList()
 				}).Reverse());
-			});
+			}).WithSummary("Returns all sessions for user who is a creator");
 
 			//get session if user is part of it
 			app.MapGet("/sessions/participant/{userName}", async(string userName, ApplicationDbContext db) =>
@@ -248,7 +252,7 @@ namespace TaskManager.Extensions
 
 				if (user == null)
 				{
-					return Results.NotFound("User not found.");
+					return Results.BadRequest("User not found.");
 				}
 
 				var userSessions = await db.UserSessions
@@ -268,6 +272,11 @@ namespace TaskManager.Extensions
 					.ThenInclude(us => us.User)
 					.ToListAsync();
 
+				if (sessions == null || sessions.Count == 0)
+				{
+					return Results.NotFound("No sessions found for the user.");
+				}
+
 				var result = sessions.Select(s => new MinimalSessionDTO
 				{
 					Id = s.Id,
@@ -285,6 +294,70 @@ namespace TaskManager.Extensions
 				return Results.Ok(result);
 
 			}).WithSummary("Returns session if user is part of it");
+
+			//get deleted sessions of creator
+			app.MapGet("/sessions/deleted/{userName}", async (string userName, ApplicationDbContext db) =>
+			{
+				var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+
+				if (user == null)
+				{
+					return Results.NotFound("User not found.");
+				}
+
+				var sessionIds = await db.UserSessions
+					.Where(us => us.UserId == user.Id && us.Role == "Creator")
+					.Select(us => us.SessionId)
+					.ToListAsync();
+
+				if (!sessionIds.Any())
+				{
+					return Results.BadRequest($"You don't have any sessions. Once you create one it will be displayed here. UserId: {user.Id}");
+				}
+
+				var sessions = await db.Sessions
+					.IgnoreQueryFilters()
+					.Where(s => s.IsDeleted)
+					.Include(s => s.UserSessions)
+					.ThenInclude(us => us.User)
+					.ToListAsync();
+
+				if (!sessions.Any())
+				{
+					return Results.NotFound("There aren't any existing sessions.");
+				}
+
+				return Results.Ok(
+					sessions.Select(s => new MinimalSessionDTO
+					{
+						Id = s.Id,
+						Title = s.Title,
+						Description = s.Description,
+						UserSessions = s.UserSessions.Select(us => new MinimalUserSessionDTO
+						{
+							SessionId = us.SessionId,
+							SessionName = us.SessionName,
+							UserName = us.User?.UserName ?? "",
+							Role = us.Role ?? "User"
+						}).ToList()
+					}).Reverse());
+			}).WithSummary("Returns deleted sessions of the creator");
+			
+			//soft delete session
+			app.MapDelete("/sessions/{sessionId}", async (Guid sessionId, ApplicationDbContext db) =>
+			{
+				var session = await db.Sessions
+					.Include(s => s.UserSessions)
+					.FirstOrDefaultAsync(s => s.Id == sessionId);
+				if (session == null)
+				{
+					return Results.NotFound("Session not found.");
+				}
+				session.IsDeleted = true;
+				db.Sessions.Update(session);
+				await db.SaveChangesAsync();
+				return Results.Ok("Session deleted successfully.");
+			}).WithSummary("Soft deletes a session by its ID" );
 		}
 	}
 }

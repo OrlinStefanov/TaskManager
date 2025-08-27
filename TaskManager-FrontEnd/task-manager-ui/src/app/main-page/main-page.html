@@ -45,6 +45,11 @@
                     <h5 class="card-title">{{l_session.title}}</h5>
                     <p class="card-text">{{l_session.description}}</p>
                   </div>
+                  <div class="card-footer text-end">
+                    <a (click)="deleteSession(l_session.id)" style="text-decoration: none; color: inherit;" title="Delete session">
+                      <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
+                    </a>
+                  </div>
                 </div>
               </a>
   
@@ -66,6 +71,32 @@
                   <div class="card-body">
                     <h5 class="card-title">{{p_session.title}}</h5>
                     <p class="card-text">{{p_session.description}}</p>
+                  </div>
+                </div>
+              </a>  
+            </div>
+          </div> 
+        </div>
+        <div class="col-md-12" style="margin-top: 20%;">
+          <h3>Archived's sessions</h3>
+          <hr>
+        </div>
+        <div class="col-md-12 text-center">
+          <h4 *ngIf="!archive_loading" style="margin-top: 20%;" class="text-secondary">You don't participate in any sessions. Once someone invites you sessions will appear here.</h4>
+          <!--If there are sessions-->
+          <div *ngIf="archive_loading" class="row row-cols-md-5 g-5" style="margin-top: 20px;">
+            <div *ngFor="let a_session of archive_Sessions" class="col">
+              <a style="text-decoration: none; color: inherit;">
+                <div class="card">
+                  <span class="imgD"></span>
+                  <div class="card-body">
+                    <h5 class="card-title">{{a_session.title}}</h5>
+                    <p class="card-text">{{a_session.description}}</p>
+                  </div>
+                  <div class="card-footer text-end">
+                    <a style="text-decoration: none; color: inherit;" title="Delete session">
+                      <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
+                    </a>
                   </div>
                 </div>
               </a>  

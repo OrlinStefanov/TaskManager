@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 using TaskManager.Models;
 
 namespace TaskManager.Data
@@ -16,6 +17,12 @@ namespace TaskManager.Data
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
+
+			builder.Entity<Session>()
+				.HasQueryFilter(s => !s.IsDeleted);
+
+			builder.Entity<UserSession>()
+				.HasQueryFilter(us => us.Session != null && !us.Session.IsDeleted);
 
 			builder.Entity<ApplicationUser>()
 				.HasMany(u => u.UserSessions)

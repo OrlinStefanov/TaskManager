@@ -10,5 +10,7 @@ namespace TaskManager.Models
 
 		public ICollection<UserSession>? UserSessions { get; set; }
 		public ICollection<TaskItem>? Tasks { get; set; }
+
+		public bool IsDeleted { get; set; } = false;
 	}
 }

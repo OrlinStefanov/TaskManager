@@ -29,7 +29,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-	options.ExpireTimeSpan = TimeSpan.FromDays(1); 
+	options.ExpireTimeSpan = TimeSpan.FromDays(7); 
 	options.SlidingExpiration = true;               
 	options.Cookie.HttpOnly = true;                 
 	options.Cookie.SameSite = SameSiteMode.None;

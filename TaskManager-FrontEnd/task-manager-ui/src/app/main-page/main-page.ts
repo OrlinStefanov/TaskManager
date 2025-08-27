@@ -39,12 +39,15 @@ export class MainPage {
 
   //to load sessions
   load_Sessions: Session[] = [];
+  is_loading: boolean = false;
 
   //load sessiosn if you participate in any
   participate_Sessions: Session[] = [];
   participate_loading: boolean = false;
 
-  is_loading: boolean = false;
+  //archive sessions
+  archive_Sessions: Session[] = [];
+  archive_loading: boolean = false;
 
   //to store user sessions
   userSessions: UserSession[] = [];
@@ -75,6 +78,7 @@ export class MainPage {
 
         this.getCurrentUserSessions();
         this.getParticipateSessions();
+        this.getDeletedSessions();
       },
       error: () => {
         this.userName = null;
@@ -197,6 +201,32 @@ export class MainPage {
         this.participate_loading = false;
       }
     }); 
+  }
+
+  public deleteSession(sessionId: number) {
+    this.authService.deleteSession(sessionId).subscribe({
+      next: () => {
+        showAlert(this, 'success', 'Session deleted successfully');
+        this.getCurrentUserSessions();
+      },
+      error: (err) => showAlert(this, 'danger', err.error || 'Failed to delete session')
+    });
+  }
+
+  public getDeletedSessions() {
+    this.authService.deleteSessionByCreator(this.userName).subscribe({
+      next: (sessions) => {
+        console.log(sessions);
+        this.archive_Sessions = sessions;
+        this.archive_loading = true;
+        showAlert(this, 'success', 'Deleted sessions retrieved successfully');
+        this.getCurrentUserSessions();
+      },
+      error: (err) => {
+        showAlert(this, 'danger', err.error || 'Failed to retrieve deleted sessions');
+        this.archive_loading = false;
+      } 
+    });
   }
 
 }
