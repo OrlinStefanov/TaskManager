@@ -19,7 +19,7 @@
           <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Create</button>
         </form>
         <div class="col-md d-flex justify-content-end">
-            <a>
+            <a data-bs-toggle="offcanvas" data-bs-target="#profileOffcanvas">
               <img src="assets/Images/profile.png" alt="Profile photo" width="40" height="40"/>
             </a>
         </div>
@@ -46,7 +46,7 @@
                     <p class="card-text">{{l_session.description}}</p>
                   </div>
                   <div class="card-footer text-end">
-                    <a (click)="deleteSession(l_session.id, $event)" id="btn_delete" style="text-decoration: none; color: inherit;" title="Delete session">
+                    <a (click)="deleteSession(l_session.id, $event)" id="btn_delete" style="text-decoration: none; color: inherit;" title="Remove session">
                       <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
                     </a>
                   </div>
@@ -78,11 +78,11 @@
           </div> 
         </div>
         <div class="col-md-12" style="margin-top: 20%;">
-          <h3>Archived's sessions</h3>
+          <h3>Removed sessions</h3>
           <hr>
         </div>
         <div class="col-md-12 text-center">
-          <h4 *ngIf="!archive_loading" style="margin-top: 20%;" class="text-secondary">You don't participate in any sessions. Once someone invites you sessions will appear here.</h4>
+          <h4 *ngIf="!archive_loading" style="margin-top: 20%;" class="text-secondary">Here are displayed all your sessions that have been removed.</h4>
           <!--If there are sessions-->
           <div *ngIf="archive_loading" class="row row-cols-md-5 g-5" style="margin-top: 20px;">
             <div *ngFor="let a_session of archive_Sessions" class="col">
@@ -97,7 +97,7 @@
                     <a (click)="restoreSession(a_session.id, $event)" id="btn_restore" id="btn_delete" style="text-decoration: none; color: inherit; margin-right: 10px;" title="Restore session">
                       <img src="assets/Images/undo.png" alt="Profile photo" width="20" height="20"/>
                     </a>
-                    <a (click)="hardDeleteSession(a_session.id, $event)" id="btn_delete" style="text-decoration: none; color: inherit;" title="Delete session">
+                    <a (click)="tobeDeletedSession(a_session.id)" data-bs-toggle="modal" data-bs-target="#checking" id="btn_delete" style="text-decoration: none; color: inherit;" title="Delete session">
                       <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
                     </a>
                   </div>
@@ -168,7 +168,90 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-outline-primary" (click)="createSession()">Create</button>
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" (click)="createSession()">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="checking" aria-labelledby="checking" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Are you sure you want to delete it permanently?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" (click)="hardDeleteSession($event)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Offcanvas Profile -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="profileOffcanvas">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">Profile</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  
+  <div class="offcanvas-body">
+    <!-- Profile Header -->
+    <div class="text-center mb-4">
+      <div class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 80px; height: 80px; margin: 0 auto; font-size: 36px;">
+        {{userName?.charAt(0).toUpperCase()}}
+      </div>
+      <h5 class="fw-bold">{{userName}}</h5>
+      <p class="text-muted mb-1">{{userEmail}}</p>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs justify-content-center" id="profileTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">Settings</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">Activity</button>
+      </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content mt-3">
+      <!-- Overview -->
+      <div class="tab-pane fade show active" id="overview" role="tabpanel">
+        <div class="d-flex justify-content-around text-muted my-3">
+          <div><strong>42</strong><br><small>Posts</small></div>
+          <div><strong>120</strong><br><small>Followers</small></div>
+          <div><strong>Jan 2023</strong><br><small>Joined</small></div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="tab-pane fade" id="settings" role="tabpanel">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" value="John Doe">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" value="john@example.com">
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+        </form>
+      </div>
+
+      <!-- Activity -->
+      <div class="tab-pane fade" id="activity" role="tabpanel">
+        <ul class="list-group">
+          <li class="list-group-item">Posted a new project 🔥</li>
+          <li class="list-group-item">Updated profile picture 🖼️</li>
+          <li class="list-group-item">Gained 5 new followers 🎉</li>
+        </ul>
       </div>
     </div>
   </div>

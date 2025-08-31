@@ -6,7 +6,15 @@ body {
     padding: 0;
     background-color: #0d0c11;
     color: #ffffff;
+}
 
+.offcanvas {
+    background: linear-gradient(135deg, hsl(240, 9%, 13%), hsl(240 8% 6%));
+    color: #ffffff;
+}
+
+.offcanvas p {
+    color: #b4b4b4;
 }
 
 html, body {

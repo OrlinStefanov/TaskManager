@@ -314,13 +314,9 @@ namespace TaskManager.Extensions
 					return Results.NotFound("User not found.");
 				}
 
-				var creator = await db.UserSessions
-					.IgnoreQueryFilters()
-					.FirstOrDefaultAsync(us => us.UserId == user.Id && us.Role == "Creator");
-
 				var sessionIds = await db.UserSessions
 					.IgnoreQueryFilters()
-					.Where(us => us.UserId == creator.UserId)
+					.Where(us => us.UserId == user.Id && us.Role == "Creator")
 					.Select(us => us.SessionId)
 					.ToListAsync();
 
@@ -331,7 +327,7 @@ namespace TaskManager.Extensions
 
 				var sessions = await db.Sessions
 					.IgnoreQueryFilters()
-					.Where(s => s.IsDeleted)
+					.Where(s => s.IsDeleted && sessionIds.Contains(s.Id))
 					.Include(s => s.UserSessions)
 					.ThenInclude(us => us.User)
 					.ToListAsync();

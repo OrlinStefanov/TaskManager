@@ -25,6 +25,8 @@ export class MainPage {
   message: string = '';
   alertType: 'success' | 'danger' | '' = '';
 
+  tobedeletedSessionId: number = 0;
+
   user_data: User = {
     userNameOrEmail: '',
     role: 'User'
@@ -166,6 +168,8 @@ export class MainPage {
       next: () => {
         showAlert(this, 'success', 'Session created successfully');
         this.getCurrentUserSessions();
+        this.session.title = '';
+        this.session.description = '';
       },
       error: (err) => showAlert(this, 'danger', err.error || 'Failed to create session')
     });
@@ -214,10 +218,15 @@ export class MainPage {
     });
   }
 
-  public hardDeleteSession(sessionId: number, event :MouseEvent) {
+  public hardDeleteSession(event :MouseEvent) {
+    if (this.tobedeletedSessionId === 0) {
+      showAlert(this, 'danger', 'Invalid session id');
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
-    this.authService.hardDeleteSession(sessionId).subscribe({
+    this.authService.hardDeleteSession(this.tobedeletedSessionId).subscribe({
       next: () => {
         showAlert(this, 'success', 'Session permanently deleted successfully');
         this.getDeletedSessions();
@@ -252,5 +261,9 @@ export class MainPage {
       },
       error: (err) => showAlert(this, 'danger', err.error || 'Failed to restore session')
     });
+  }
+
+  tobeDeletedSession(sessionId: number) {
+    this.tobedeletedSessionId = sessionId;
   }
 }
