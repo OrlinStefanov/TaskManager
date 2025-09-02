@@ -67,6 +67,13 @@ a {
     font-size: 30px;
 }
 
+.bg-dark {
+  background-color: #1e1e2f !important;
+}
+.border-secondary {
+  border-color: #333 !important;
+}
+
 .modal input, textarea, textarea:focus, select {
     width: 100%;
     display: flex;
@@ -81,8 +88,7 @@ a {
 }
 
 .search_bar {
-    margin-left: 20%;
-    width: 40%  ;
+    width: 100%;
 }
 
 .container {
@@ -126,6 +132,10 @@ a {
     .search_bar {
         margin-left: 10%;
         width: 80%;
+    }
+
+    .card #btn_delete {
+        display: block;
     }
     
 }

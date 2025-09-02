@@ -127,6 +127,14 @@ namespace TaskManager.Extensions
 
 				return Results.Ok(result);
 			}).WithSummary("Gives the user searched by userNameOrEmail and returns his name and email if valid");
+		
+			//log out user
+			app.MapPost("/logout", async (
+				SignInManager<ApplicationUser> signInManager) =>
+			{
+				await signInManager.SignOutAsync();
+				return Results.Ok("User logged out successfully.");
+			}).WithSummary("Logs out the current user by clearing the authentication cookie");
 		}
 		public static void SessionsEndpoints(this WebApplication app)
 		{

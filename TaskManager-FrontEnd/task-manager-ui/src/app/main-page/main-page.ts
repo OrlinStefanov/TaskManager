@@ -263,6 +263,18 @@ export class MainPage {
     });
   }
 
+  public logout() {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.authService.setUser(null);
+        window.location.href = '/login';
+      },
+      error: () => {
+        showAlert(this, 'danger', 'Failed to logout');
+      }
+    });
+  }
+
   tobeDeletedSession(sessionId: number) {
     this.tobedeletedSessionId = sessionId;
   }
