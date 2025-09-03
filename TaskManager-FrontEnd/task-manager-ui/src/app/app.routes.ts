@@ -4,11 +4,13 @@ import { Startup } from './startup/startup';
 import { Register } from './register/register';
 import { MainPage } from './main-page/main-page';
 import { AuthGuard } from './services/auth-guard/auth-guard';
+import { SessionDetail } from './session-detail/session-detail';
 
 export const routes: Routes = [
   { path: '', component: Startup },
   { path: 'login', component: Login },
   { path: 'register', component: Register},
   { path: 'dashboard', component: MainPage, canActivate: [AuthGuard]},
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' }
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: 'sessions/:id', component: SessionDetail, canActivate: [AuthGuard]}
 ];
