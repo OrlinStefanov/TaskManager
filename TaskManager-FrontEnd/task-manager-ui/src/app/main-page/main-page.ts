@@ -25,7 +25,7 @@ export class MainPage {
   message: string = '';
   alertType: 'success' | 'danger' | '' = '';
 
-  tobedeletedSessionId: number = 0;
+  tobedeletedSessionId: string = "";
 
   user_data: User = {
     userNameOrEmail: '',
@@ -165,11 +165,15 @@ export class MainPage {
     this.session.userSessions = this.userSessions;
 
     this.authService.createSession(this.session).subscribe({
-      next: () => {
-        showAlert(this, 'success', 'Session created successfully');
-        this.getCurrentUserSessions();
+      next: (createdsession) => {
+        this.load_Sessions.push(createdsession);
+
         this.session.title = '';
         this.session.description = '';
+        this.userSessions = [];
+        this.participants = [];
+
+        showAlert(this, 'success', 'Session created successfully');
       },
       error: (err) => showAlert(this, 'danger', err.error || 'Failed to create session')
     });
@@ -205,21 +209,28 @@ export class MainPage {
     }); 
   }
 
-  public deleteSession(sessionId: number, event :MouseEvent) {
+  public deleteSession(sessionId: string, event :MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
     this.authService.deleteSession(sessionId).subscribe({
       next: () => {
         showAlert(this, 'success', 'Session deleted successfully');
-        this.getCurrentUserSessions();
-        this.getDeletedSessions();
+
+        this.archive_loading = true;
+
+        if (this.load_Sessions.length === 1) this.is_loading = false;
+        
+        const deleted = this.load_Sessions.find(s => s.id === sessionId);
+
+        if (deleted && !this.archive_Sessions.some(s => s.id === sessionId)) this.archive_Sessions.push(deleted);
+        this.load_Sessions = this.load_Sessions.filter(s => s.id !== sessionId);
       },
       error: (err) => showAlert(this, 'danger', err.error || 'Failed to delete session')
     });
   }
 
   public hardDeleteSession(event :MouseEvent) {
-    if (this.tobedeletedSessionId === 0) {
+    if (this.tobedeletedSessionId == null) {
       showAlert(this, 'danger', 'Invalid session id');
       return;
     }
@@ -228,8 +239,12 @@ export class MainPage {
     event.stopPropagation();
     this.authService.hardDeleteSession(this.tobedeletedSessionId).subscribe({
       next: () => {
+        this.archive_loading = true;
+        this.archive_Sessions = this.archive_Sessions.filter(s => s.id !== this.tobedeletedSessionId);
+
+        if (this.archive_Sessions.length === 0) this.archive_loading = false;
+
         showAlert(this, 'success', 'Session permanently deleted successfully');
-        this.getDeletedSessions();
       },
       error: (err) => showAlert(this, 'danger', err.error || 'Failed to permanently delete session')
     });
@@ -250,14 +265,24 @@ export class MainPage {
     });
   }
 
-  public restoreSession(sessionId: number, event :MouseEvent) {
+  public restoreSession(sessionId: string, event :MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
     this.authService.restoreSession(sessionId).subscribe({
       next: () => {
+        this.archive_loading = true;
+
+        if (this.archive_Sessions.length === 1) this.archive_loading = false;
+        const restored = this.archive_Sessions.find(s => s.id === sessionId);
+
+        if (restored && !this.load_Sessions.some(s => s.id === sessionId)) {
+          this.is_loading = true;
+          this.load_Sessions.push(restored);
+        }
+
+        this.archive_Sessions = this.archive_Sessions.filter(s => s.id !== sessionId);
+
         showAlert(this, 'success', 'Session restored successfully');
-        this.getDeletedSessions();
-        this.getCurrentUserSessions();
       },
       error: (err) => showAlert(this, 'danger', err.error || 'Failed to restore session')
     });
@@ -275,7 +300,7 @@ export class MainPage {
     });
   }
 
-  tobeDeletedSession(sessionId: number) {
+  tobeDeletedSession(sessionId: string) {
     this.tobedeletedSessionId = sessionId;
   }
 }

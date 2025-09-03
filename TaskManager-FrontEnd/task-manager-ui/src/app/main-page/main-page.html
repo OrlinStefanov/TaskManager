@@ -15,7 +15,7 @@
       
       <!-- Centered input group instead of a form -->
       <div class="mx-auto search_bar">
-        <div class="input-group" style="width: 50%; margin-left: 20%;">
+        <div class="input-group" style="width: 50%; margin-left: 23%;">
           <input type="text" class="form-control" placeholder="Create sessions and enjoy working easier" aria-label="Search" disabled>
           <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
             Create
@@ -89,7 +89,7 @@
           <hr>
         </div>
         <div class="col-md-12 text-center">
-          <h4 *ngIf="!archive_loading" style="margin-top: 20%;" class="text-secondary">Here are displayed all your sessions that have been removed.</h4>
+          <h4 *ngIf="!archive_loading" style="margin-top: 20%;" class="text-secondary">Here are displayed all sessions that you have removed.</h4>
           <!--If there are sessions-->
           <div *ngIf="archive_loading" class="row row-cols-md-5 g-5" style="margin-top: 20px;">
             <div *ngFor="let a_session of archive_Sessions" class="col">
