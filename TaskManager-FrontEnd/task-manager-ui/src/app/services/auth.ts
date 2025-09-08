@@ -38,6 +38,37 @@ export interface Session {
   userSessions: UserSession[];
 }
 
+//for the session page with tasks
+export interface Sesison_Full {
+  id?: string;
+  title: string;
+  description: string;
+
+  userSessions: UserSession[];
+
+  tasks: Task[];
+}
+
+export interface Task {
+  id?: string;
+  title: string;
+  description: string;
+
+  dueDate: Date;
+  sessionId: string;
+
+  assignedToUserId: string;
+  createdByUserId: string;
+  status: "To Do" | "In Progress" | "Done";
+}
+
+export interface UserSessionFull {
+  userId: string;
+  userName: string;
+  userEmail: string;
+  role: "Admin" | "User" | "Creator";
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -49,6 +80,16 @@ export class Auth {
   private apiUrl = 'https://localhost:7188'; //.NET API base URL
 
   constructor(private http: HttpClient) {}
+
+  private _userid: string = '';
+
+  set userid(id: string) {
+    this._userid = id;
+  }
+
+  get userid(): string {
+    return this._userid;
+  }
 
   //login method to authenticate user
   login(data: LoginRequest): Observable<any> {
@@ -113,5 +154,15 @@ export class Auth {
   //restore deleted session by id
   restoreSession(sessionId: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/sessions/restore/${sessionId}`, {}, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  //gets session by id
+  getSessionById(sessionId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/sessions_all/${sessionId}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  //create task
+  createTask(sessionId : string, task: Task): Observable<any> {
+    return this.http.post(`${this.apiUrl}/sessions/${sessionId}/tasks`, task, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
   }
 }

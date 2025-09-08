@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Xml;
 using TaskManager.Data;
 using TaskManager.DTO;
 using TaskManager.Models;
@@ -121,6 +122,7 @@ namespace TaskManager.Extensions
 
 				var result = new
 				{
+					user.Id,
 					user.UserName,
 					user.Email,
 				};
@@ -415,6 +417,89 @@ namespace TaskManager.Extensions
 				await db.SaveChangesAsync();
 				return Results.Ok("Session restored successfully.");
 			}).WithSummary("Restores a soft-deleted session by its ID");
+			
+			//get all data for a session by id
+			app.MapGet("/sessions_all/{id}", async(Guid id, ApplicationDbContext db) =>
+				{
+					var session = await db.Sessions
+						.Include(s => s.UserSessions)
+						.ThenInclude(us => us.User)
+						.Include(s => s.Tasks)
+						.ThenInclude(t => t.AssignedToUser)
+						.FirstOrDefaultAsync(s => s.Id == id);
+
+					if (session == null)
+					{ 
+						return Results.NotFound("Session not found.");
+					}
+
+					var result = new
+					{
+						session.Id,
+						session.Title,
+						session.Description,
+						UserSessions = session.UserSessions.Select(us => new
+						{
+							us.UserId,
+							us.SessionId,
+							us.SessionName,
+							UserName = us.User?.UserName ?? "",
+							us.Role
+						}).ToList(),
+						Tasks = session.Tasks?.Select(t => new
+						{
+							t.Id,
+							t.Title,
+							t.Description,
+							t.DueDate,
+							t.Status,
+							CreatedByUsername = t.CreatedByUser?.UserName ?? "Unknown",
+							AssignedToUserName = t.AssignedToUser?.UserName ?? "Unassigned"
+						}).ToList()
+					};
+
+					return Results.Ok(result);
+				}).WithSummary("Returns all data for session find by id");
+
+			//create task in session
+			app.MapPost("/sessions/{sessionId}/tasks", async (Guid sessionid, ApplicationDbContext db, TaskItem task_model) =>
+			{
+				var session = await db.Sessions
+					.Include(s => s.Tasks)
+					.FirstOrDefaultAsync(s => s.Id == sessionid);
+
+				if (session == null)
+				{
+					return Results.NotFound("Session not found.");
+				}
+
+				if (task_model.DueDate.Kind == DateTimeKind.Unspecified)
+				{
+					task_model.DueDate = DateTime.SpecifyKind(task_model.DueDate, DateTimeKind.Utc);
+				}
+				else
+				{
+					task_model.DueDate = task_model.DueDate.ToUniversalTime();
+				}
+
+				var newTask = new TaskItem
+				{
+					Id = Guid.NewGuid(),
+					Title = task_model.Title,
+					Description = task_model.Description,
+					DueDate = task_model.DueDate,
+					SessionId = sessionid,
+					AssignedToUserId = task_model.AssignedToUserId,
+					CreatedByUserId = task_model.CreatedByUserId,
+					Status = "To Do",
+				};
+
+				db.TaskItems.Add(newTask);
+
+				await db.SaveChangesAsync();
+
+				return Results.Created($"/sessions/{sessionid}/tasks/{newTask.Id}", newTask);
+			}).WithSummary("Creates task by using the id of a session");
 		}
 	}
 }

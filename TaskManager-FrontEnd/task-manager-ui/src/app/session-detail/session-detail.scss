@@ -1,0 +1,54 @@
+.newTask {
+    width: 100%;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(to right, #a259ff, #008cff);
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.modal input, textarea, textarea:focus, select {
+    width: 100%;
+    display: flex;
+  align-items: center;
+  background-color: #0d0c11;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+
+    color: #ffffff;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, hsl(240, 9%, 13%), hsl(240 8% 6%));
+
+    color: #ffffff;
+    border: #a259ff solid 1px;
+}
+
+.modal-header {
+    border: #a259ff solid 1px;
+}
+
+.modal-footer {
+    border: #a259ff solid 1px;
+}
+
+::placeholder {
+    color: #b4b4b4;
+}
+
+::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+.typeTasks .card {
+    background-color: #15131a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    color: #999797;
+}

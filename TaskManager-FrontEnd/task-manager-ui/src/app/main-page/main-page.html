@@ -126,21 +126,21 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Create session</h1>
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Create session:</h1>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <form>
           <div class="mb-3">
-            <label for="sessionName" class="form-label">Session Name</label>
+            <label for="sessionName" class="form-label">Session Name:</label>
             <input type="text" class="form-control" id="sessionName" placeholder="Enter session name" [(ngModel)]="session.title" name="title" required>
           </div>
           <div class="mb-3">
-            <label for="sessionDescription" class="form-label">Session Description</label>
+            <label for="sessionDescription" class="form-label">Session Description:</label>
             <textarea class="form-control" id="sessionDescription" rows="3" placeholder="Enter session description" [(ngModel)]="session.description" name="description"></textarea>
           </div>
           <div class="mb-3">
-            <label for="sessionUsers" class="form-label">Participants</label>
+            <label for="sessionUsers" class="form-label">Participants:</label>
             <div class="input-group mb-3">
                 <div *ngFor="let p of participants" class="d-flex align-items-center rounded mb-3 participant">
                   <div class="me-3 bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center"
@@ -174,7 +174,7 @@
           </div>
         </form>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer d-flex justify-content-between">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" (click)="createSession()">Create</button>
       </div>

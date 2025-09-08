@@ -19,6 +19,7 @@ import { showAlert } from '../services/helper';
 
 export class MainPage {
   //fro the page
+  public userId: string | null = null;
   public userName: string | null = null;
   public userEmail: string | null = null;
 
@@ -62,9 +63,11 @@ export class MainPage {
   ngOnInit() {
     this.authService.getCurrentUser().subscribe({
       next: (user) => {
+        this.userId = user.id;
         this.userName = user.userName;
         this.userEmail = user.email;
         this.authService.setUser(user.userName);
+        this.authService.userid = user.id || '';
 
         this.participants.push({
           userName: this.userName,
