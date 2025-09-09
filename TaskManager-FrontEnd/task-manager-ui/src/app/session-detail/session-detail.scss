@@ -12,12 +12,12 @@
 .modal input, textarea, textarea:focus, select {
     width: 100%;
     display: flex;
-  align-items: center;
-  background-color: #0d0c11;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 0.6rem;
-  margin-bottom: 1rem;
+    align-items: center;
+    background-color: #0d0c11;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 0.6rem;
+    margin-bottom: 1rem;
 
     color: #ffffff;
 }
@@ -26,15 +26,15 @@
     background: linear-gradient(135deg, hsl(240, 9%, 13%), hsl(240 8% 6%));
 
     color: #ffffff;
-    border: #a259ff solid 1px;
+    border: #3c225e solid 1px;
 }
 
 .modal-header {
-    border: #a259ff solid 1px;
+    border: #3c225e solid 1px;
 }
 
 .modal-footer {
-    border: #a259ff solid 1px;
+    border: #3c225e solid 1px;
 }
 
 ::placeholder {
@@ -51,4 +51,18 @@
     border-radius: 8px;
     margin-bottom: 1rem;
     color: #999797;
+    height: 80%;
+    justify-items: center;
+}
+
+.col1 .card {
+    background-color: #15131a;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+.col1, .card, p {
+    color: #999797;
+    font-size: 14px;
 }

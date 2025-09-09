@@ -5,10 +5,15 @@
     <img src="assets/Images/back.png" style="width: 30px;"/>
     </a>
     <div class="text-center mx-auto">
-      <h1 class="navbar-brand mb-0 h1" style="font-size: 26px;">{{session?.title}}</h1>
+      <h1 class="navbar-brand mb-0 h1" style="font-size: 26px; margin-left: 25%;">{{session?.title}}</h1>
     </div>
     <div class="text-end">
-      <button class="btn btn-outline-primary newTask" data-bs-toggle="modal" data-bs-target="#staticBackdrop">+  New Task</button>
+      <button class="btn btn-outline-primary newTask" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        <div class="d-flex justify-content-between">
+          <div class="p-1">+</div>
+          <div class="p-1">New Task</div>
+        </div>
+      </button>
     </div>
 
 
@@ -47,6 +52,60 @@
         </div>
       </div>
     </div>
+
+    <div class="col-4 mt-4 col1">
+      <div class="card mb-3 display" style="border: 2px dashed #552f86; border-radius: 8px; background-color: #a159ff0e; min-height: 600px;">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title fw-bold">To Do</h5>
+          </div>
+          <p class="card-text">Tasks that need to be started</p>
+          <p class="card-text">{{todoTaskCount}} task</p>
+
+          <div *ngFor="let task of session?.tasks">
+            <div *ngIf="task.status === 'To Do'" class="card mb-2" style="border: 1px solid rgb(39, 39, 39); border-left: 4px solid #552f86; border-radius: 8px;">
+              <div class="card-body" style="margin-bottom: 15px;">
+                <div class="d-flex justify-content-between">
+                  <h5 class="card-title" style="width: 80%;">{{task.title}}</h5>
+                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;">
+                    <option selected>To Do</option>
+                    <option>In Progress</option>
+                    <option>Done</option>
+                  </select>
+                </div>
+                <p class="card-text">{{task.description}}</p>
+              </div>
+              <div class="card-footer d-flex justify-content-between" style="height: 30px;">
+                <p class="card-text"><small>{{task.assignedToUserName}}</small></p>
+                <p class="card-text"><small>{{task.dueDate | date:'mediumDate'}}</small></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-4 mt-4 col1">
+      <div class="card mb-3 display" style="border: 2px dashed #6a7503; border-radius: 8px; background-color: #6a750321; min-height: 600px;">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title fw-bold">In Progress</h5>
+          </div>
+          <p class="card-text">Tasks currently being worked on</p>
+          <p class="card-text">{{inProgressTaskCount}} task</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-4 mt-4 col1">
+      <div class="card mb-3 display" style="border: 2px dashed #1d7432; border-radius: 8px; background-color: #28a7461a; min-height: 600px;">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title fw-bold">Done</h5>
+          </div>
+          <p class="card-text">Completed tasks</p>
+          <p class="card-text">{{doneTaskCount}} task</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -62,11 +121,11 @@
         <form>
           <div class="mb-3">
             <label for="taskTitle" class="form-label">Title:</label>
-            <input type="text" class="form-control" id="taskTitle" placeholder="Enter title" [(ngModel)]="createdTaskModel.title" name="title" required>
+            <input type="text" maxlength="50" class="form-control" id="taskTitle" placeholder="Enter title" [(ngModel)]="createdTaskModel.title" name="title" required>
           </div>
           <div class="mb-3">
             <label for="taskDescription" class="form-label">Description:</label>
-            <input type="text" class="form-control" id="taskDescription" placeholder="Enter description" [(ngModel)]="createdTaskModel.description" name="description" required>
+            <input type="text" maxlength="50" class="form-control" id="taskDescription" placeholder="Enter description" [(ngModel)]="createdTaskModel.description" name="description" required>
           </div>
           <div class="mb-3">
             <label for="taskDueDate" class="form-label">Due Date:</label>

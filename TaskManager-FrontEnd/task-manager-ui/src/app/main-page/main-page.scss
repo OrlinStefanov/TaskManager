@@ -29,6 +29,10 @@ hr {
     height: 20rem;
 }
 
+.card p {
+    color: #999797;
+}
+
 .card:hover {
     transform: scale(1.05);
     transition: all 0.3s ease-in-out;
@@ -99,15 +103,15 @@ a {
     background: linear-gradient(135deg, hsl(240, 9%, 13%), hsl(240 8% 6%));
 
     color: #ffffff;
-    border: #a259ff solid 1px;
+    border: #3c225e solid 1px;
 }
 
 .modal-header {
-    border: #a259ff solid 1px;
+    border: #3c225e solid 1px;
 }
 
 .modal-footer {
-    border: #a259ff solid 1px;
+    border: #3c225e solid 1px;
 }
 
 ::placeholder {

@@ -133,11 +133,11 @@
         <form>
           <div class="mb-3">
             <label for="sessionName" class="form-label">Session Name:</label>
-            <input type="text" class="form-control" id="sessionName" placeholder="Enter session name" [(ngModel)]="session.title" name="title" required>
+            <input type="text" maxlength="15" class="form-control" id="sessionName" placeholder="Enter session name" [(ngModel)]="session.title" name="title" required>
           </div>
           <div class="mb-3">
             <label for="sessionDescription" class="form-label">Session Description:</label>
-            <textarea class="form-control" id="sessionDescription" rows="3" placeholder="Enter session description" [(ngModel)]="session.description" name="description"></textarea>
+            <textarea class="form-control" maxlength="40" id="sessionDescription" rows="3" placeholder="Enter session description" [(ngModel)]="session.description" name="description"></textarea>
           </div>
           <div class="mb-3">
             <label for="sessionUsers" class="form-label">Participants:</label>
