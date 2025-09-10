@@ -67,17 +67,27 @@
               <div class="card-body" style="margin-bottom: 15px;">
                 <div class="d-flex justify-content-between">
                   <h5 class="card-title" style="width: 80%;">{{task.title}}</h5>
-                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;">
-                    <option selected>To Do</option>
-                    <option>In Progress</option>
-                    <option>Done</option>
+                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;" [(ngModel)]="task.status" (ngModelChange)="updateTaskStatus(task.id, task.status)">
+                    <option value="To Do" selected>To Do</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
                   </select>
                 </div>
                 <p class="card-text">{{task.description}}</p>
               </div>
               <div class="card-footer d-flex justify-content-between" style="height: 30px;">
-                <p class="card-text"><small>{{task.assignedToUserName}}</small></p>
-                <p class="card-text"><small>{{task.dueDate | date:'mediumDate'}}</small></p>
+                <div class="d-flex align-items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16" >
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                  </svg>
+                  <p style="margin-left: 5px;" class="card-text"><small>{{task.assignedToUserName}}</small></p>
+                </div>
+                <div class="d-flex align-items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                  </svg>
+                  <p style="margin-left: 5px;" class="card-text"><small>{{task.dueDate | date:'mediumDate'}}</small></p>
+                </div>
               </div>
             </div>
           </div>
@@ -92,6 +102,36 @@
           </div>
           <p class="card-text">Tasks currently being worked on</p>
           <p class="card-text">{{inProgressTaskCount}} task</p>
+
+          <div *ngFor="let task of session?.tasks">
+            <div *ngIf="task.status === 'In Progress'" class="card mb-2" style="border: 1px solid rgb(39, 39, 39); border-left: 4px solid #552f86; border-radius: 8px;">
+              <div class="card-body" style="margin-bottom: 15px;">
+                <div class="d-flex justify-content-between">
+                  <h5 class="card-title" style="width: 80%;">{{task.title}}</h5>
+                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;"  [(ngModel)]="task.status" (ngModelChange)="updateTaskStatus(task.id, task.status)">
+                    <option value="To Do">To Do</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                  </select>
+                </div>
+                <p class="card-text">{{task.description}}</p>
+              </div>
+              <div class="card-footer d-flex justify-content-between" style="height: 30px;">
+                <div class="d-flex align-items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16" >
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                  </svg>
+                  <p style="margin-left: 5px;" class="card-text"><small>{{task.assignedToUserName}}</small></p>
+                </div>
+                <div class="d-flex align-items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                  </svg>
+                  <p style="margin-left: 5px;" class="card-text"><small>{{task.dueDate | date:'mediumDate'}}</small></p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -103,6 +143,36 @@
           </div>
           <p class="card-text">Completed tasks</p>
           <p class="card-text">{{doneTaskCount}} task</p>
+
+          <div *ngFor="let task of session?.tasks">
+            <div *ngIf="task.status === 'Done'" class="card mb-2" style="border: 1px solid rgb(39, 39, 39); border-left: 4px solid #552f86; border-radius: 8px;">
+              <div class="card-body" style="margin-bottom: 15px;">
+                <div class="d-flex justify-content-between">
+                  <h5 class="card-title" style="width: 80%;">{{task.title}}</h5>
+                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;" [(ngModel)]="task.status" (ngModelChange)="updateTaskStatus(task.id, task.status)">
+                    <option value="To Do">To Do</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                  </select>
+                </div>
+                <p class="card-text">{{task.description}}</p>
+              </div>
+              <div class="card-footer d-flex justify-content-between" style="height: 30px;">
+                <div class="d-flex align-items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16" >
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                  </svg>
+                  <p style="margin-left: 5px;" class="card-text"><small>{{task.assignedToUserName}}</small></p>
+                </div>
+                <div class="d-flex align-items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                  </svg>
+                  <p style="margin-left: 5px;" class="card-text"><small>{{task.dueDate | date:'mediumDate'}}</small></p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -11,7 +11,7 @@
 		public string? CreatedByUserId { get; set; }
 		public Guid SessionId { get; set; }
 
-		public string? Status { get; set; } = "To Do"; // Possible values: To Do, In Progress, Completed
+		public string? Status { get; set; } = "To Do"; // Possible values: To Do, In Progress, Done
 
 		public ApplicationUser? AssignedToUser { get; set; }
 		public ApplicationUser? CreatedByUser { get; set; }

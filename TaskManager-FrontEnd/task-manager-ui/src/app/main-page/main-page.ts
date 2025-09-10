@@ -306,4 +306,17 @@ export class MainPage {
   tobeDeletedSession(sessionId: string) {
     this.tobedeletedSessionId = sessionId;
   }
+
+  get DoneTaskCount(): number {
+    this.authService.getCompletedTasksCount(this.userName).subscribe({
+      next: (count) => {
+        return count;
+      },
+      error: (err) => {
+        console.error('Error fetching completed tasks count:', err);
+        return 0;
+      }
+    });
+    return 0;
+  }
 }

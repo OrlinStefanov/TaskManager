@@ -65,10 +65,24 @@ export class SessionDetail {
         console.log('Task created:', res);
         this.createdTaskModel = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
         this.assignedToUserName = '';
-        // Optionally, you can refresh the session details to show the new task
+        this.session?.tasks?.push(res);
       },
       error: (error) => {
         console.error('Error creating task:', error);
+      }
+    });
+  }
+
+  public updateTaskStatus (taskId: string | undefined, status: "To Do" | "In Progress" | "Done") {
+    if(!taskId) return;
+    
+    this.authService.updateTaskStatus(taskId, status).subscribe({
+      next: (res) => {
+        showAlert(this, 'success', 'Task status updated successfully!');
+        console.log('Task status updated:', res);
+      },
+      error: (error) => {
+        console.error('Error updating task status:', error);
       }
     });
   }

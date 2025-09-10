@@ -500,6 +500,46 @@ namespace TaskManager.Extensions
 
 				return Results.Created($"/sessions/{sessionid}/tasks/{newTask.Id}", newTask);
 			}).WithSummary("Creates task by using the id of a session");
+
+			//update task status
+			app.MapPut("/tasks/{taskId}/status", async (Guid taskId, [FromBody] string newStatus, ApplicationDbContext db) =>
+			{
+				var task = await db.TaskItems.FirstOrDefaultAsync(t => t.Id == taskId);
+				if (task == null)
+				{
+					return Results.NotFound("Task not found.");
+				}
+
+				var validStatuses = new List<string> { "To Do", "In Progress", "Done" };
+				if (!validStatuses.Contains(newStatus))
+				{
+					return Results.BadRequest("Invalid status. Valid statuses are: To Do, In Progress, Done.");
+				}
+				task.Status = newStatus;
+				db.TaskItems.Update(task);
+				await db.SaveChangesAsync();
+				return Results.Ok("Task status updated successfully.");
+			}).WithSummary("Updates the status of a task by its ID");
+
+			//get the number of all the complete task that a person have done
+			app.MapGet("/tasks/completed/{userName}", async (string userName, ApplicationDbContext db) =>
+			{
+				var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+
+				if (user == null)
+				{
+					return Results.NotFound("User not found.");
+				}
+
+				var completedTasks = await db.TaskItems
+					.Where(t => t.AssignedToUserId == user.Id && t.Status == "Done")
+					.Include(t => t.AssignedToUser)
+					.Include(t => t.CreatedByUser)
+					.ToListAsync();
+
+				return Results.Ok(completedTasks.Count);
+
+			}).WithSummary("Returns the number of all the completed tasks assigned to a specific user");
 		}
 	}
 }

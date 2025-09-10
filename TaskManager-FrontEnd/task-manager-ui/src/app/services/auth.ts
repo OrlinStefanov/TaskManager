@@ -165,4 +165,14 @@ export class Auth {
   createTask(sessionId : string, task: Task): Observable<any> {
     return this.http.post(`${this.apiUrl}/sessions/${sessionId}/tasks`, task, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
   }
+
+  //update task status
+  updateTaskStatus(taskId: string, newStatus: "To Do" | "In Progress" | "Done"): Observable<any> {
+    return this.http.put(`${this.apiUrl}/tasks/${taskId}/status`,JSON.stringify(newStatus), {withCredentials: true, headers: { 'Content-Type': 'application/json' }});
+  }
+
+  //get completed tasks count for a user
+  getCompletedTasksCount(userName: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}"/tasks/completed/${userName}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
 }
