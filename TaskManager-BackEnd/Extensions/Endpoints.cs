@@ -540,6 +540,22 @@ namespace TaskManager.Extensions
 				return Results.Ok(completedTasks.Count);
 
 			}).WithSummary("Returns the number of all the completed tasks assigned to a specific user");
+
+			//delete task by id
+			app.MapDelete("/tasks/{taskId}", async (Guid taskId, ApplicationDbContext db) =>
+			{
+				var task = await db.TaskItems.FirstOrDefaultAsync(t => t.Id == taskId);
+
+				if (task == null)
+				{
+					return Results.NotFound("Task not found.");
+				}
+
+				db.TaskItems.Remove(task);
+				await db.SaveChangesAsync();
+
+				return Results.Ok("Task deleted successfully.");
+			}).WithSummary("Deletes a task by its ID");
 		}
 	}
 }
