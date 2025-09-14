@@ -189,7 +189,7 @@
         <h5 class="modal-title">Are you sure you want to delete it permanently?</h5>
       </div>
       <div class="modal-footer d-flex justify-content-between">
-        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" (click)="hardDeleteSession($event)">Delete</button>
       </div>
     </div>
@@ -244,7 +244,7 @@
           </div>
           <div class="col-6">
             <div class="p-3 bg-dark rounded text-center border border-secondary">
-              <div class="fw-bold fs-5">{{DoneTaskCount}}</div>
+              <div class="fw-bold fs-5">{{completedTasksCount}}</div>
               <div class="small">Completed Tasks</div>
             </div>
           </div>

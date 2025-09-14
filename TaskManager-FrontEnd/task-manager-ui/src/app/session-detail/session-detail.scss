@@ -86,3 +86,35 @@
 
     color: #bbbe05;
 }
+
+.spanDO {
+    background-color: #1361252f;
+    border: 1px solid #1b8b40;
+    border-radius: 10px;
+    font-size: smaller;
+    padding: 2px 8px;
+
+    color: green;
+}
+
+.taskcard .options {
+    display: none !important;
+}
+
+.taskcard:hover {
+    transform: scale(1.02);
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(192, 48, 180, 0.2);
+}
+
+.taskcard:hover .options {
+    display: flex !important;
+}
+
+.filter {
+    background-color: #15131a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    color: #999797;
+}

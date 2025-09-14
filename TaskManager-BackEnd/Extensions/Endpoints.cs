@@ -556,6 +556,52 @@ namespace TaskManager.Extensions
 
 				return Results.Ok("Task deleted successfully.");
 			}).WithSummary("Deletes a task by its ID");
+
+			//edit task by id
+			app.MapPut("/tasks/{taskId}", async (Guid taskId, [FromBody] TaskItem updatedTask, ApplicationDbContext db) =>
+			{
+				var task = await db.TaskItems.FirstOrDefaultAsync(t => t.Id == taskId);
+				if (task == null)
+				{
+					return Results.NotFound("Task not found.");
+				}
+
+				if (updatedTask.DueDate.Kind == DateTimeKind.Unspecified)
+				{
+					updatedTask.DueDate = DateTime.SpecifyKind(updatedTask.DueDate, DateTimeKind.Utc);
+				}
+				else
+				{
+					updatedTask.DueDate = updatedTask.DueDate.ToUniversalTime();
+				}				
+
+				task.Title = updatedTask.Title;
+				task.Description = updatedTask.Description;
+				task.DueDate = updatedTask.DueDate;
+				task.AssignedToUserId = updatedTask.AssignedToUserId;
+				task.Status = updatedTask.Status;
+
+				task.AssignedToUser = await db.Users.FirstOrDefaultAsync(u => u.Id == updatedTask.AssignedToUserId);
+				task.CreatedByUser = await db.Users.FirstOrDefaultAsync(u => u.Id == updatedTask.CreatedByUserId);
+
+				db.TaskItems.Update(task);
+
+				await db.SaveChangesAsync();
+
+				var result = new
+				{
+					task.Id,
+					task.Title,
+					task.Description,
+					task.DueDate,
+					task.Status,
+					task.SessionId,
+					CreatedByUsername = task.CreatedByUser?.UserName ?? "Unknown",
+					AssignedToUserName = task.AssignedToUser?.UserName ?? "Unassigned"
+				};
+
+				return Results.Ok(result);
+			}).WithSummary("Edits a task by its ID");
 		}
 	}
 }

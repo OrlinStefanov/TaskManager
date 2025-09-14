@@ -16,7 +16,6 @@
       </button>
     </div>
 
-
     <!-- Toggler (mobile view) 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
       data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -28,6 +27,39 @@
 
 <div class="container mt-4">
   <div class="row">
+    <div class="text-center" style="margin-bottom: 1rem;">
+      <div class="col-12 d-flex justify-content-start align-items-center filter">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-funnel" viewBox="0 0 16 16" style="margin-left: 10px;">
+            <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2z"/>
+          </svg>
+          <div class="d-flex align-items-center gap-3" style="margin-left: 10px;">
+            <!-- Filter -->
+            <div class="d-flex align-items-center">
+              <span class="label-text">Filter:</span>
+                <select class="form-select" style="width: 150px; height: 30px; font-size: 12px; padding: 2px; margin-left: 10px; margin-top: 18px; font-size: 14px; padding-left: 10px;">
+                  <option value="All" selected>All assignees</option>
+                  <div *ngFor="let user of session?.userSessions">
+                    <option value="{{user.userName}}">{{user.userName}}</option>
+                  </div>
+                </select>
+            </div>
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5m-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5"/>
+            </svg>
+
+            <!-- Sort -->
+            <div class="d-flex align-items-center">
+              <span class="label-text">Sort by:</span>
+              <select class="form-select" style="width: 150px; height: 30px; font-size: 12px; padding: 2px; margin-left: 10px; margin-top: 18px; font-size: 14px; padding-left: 10px;">
+                <option value="Created" selected>Created</option>
+                <option value="DueDate">Due Date</option>
+                <option value="MostRecent">Most Recent</option>
+              </select>
+            </div>
+          </div>
+        </div>
+    </div>
     <div class="col-4 typeTasks">
       <div class="card">
         <div class="card-body">
@@ -63,11 +95,24 @@
           <p class="card-text">{{todoTaskCount}} task</p>
 
           <div *ngFor="let task of session?.tasks">
-            <div *ngIf="task.status === 'To Do'" class="card mb-2" style="border: 1px solid rgb(39, 39, 39); border-left: 4px solid #552f86; border-radius: 8px;">
+            <div *ngIf="task.status === 'To Do'" class="card mb-2 taskcard" style="border: 1px solid rgb(39, 39, 39); border-left: 4px solid #552f86; border-radius: 8px;">
               <div class="card-body" style="margin-bottom: 15px;">
+                <div class="d-flex justify-content-center mb-2 options" style="gap: 30px; cursor: pointer;">
+                  <a data-bs-toggle="modal" data-bs-target="#editTaskModal" (click)="tobeEditedTaskId = task.id; editedTaskModel = task">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                      <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                    </svg>
+                  </a>
+                  <a data-bs-toggle="modal" data-bs-target="#deleteTaskModal" (click)="tobeDeletedTaskId = task.id">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                      <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                    </svg>
+                  </a>
+                </div>
                 <div class="d-flex justify-content-between">
                   <h5 class="card-title" style="width: 80%;">{{task.title}}</h5>
-                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;" [(ngModel)]="task.status" (ngModelChange)="updateTaskStatus(task.id, task.status)">
+                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;  font-size: 14px; padding-left: 10px;" [(ngModel)]="task.status" (ngModelChange)="updateTaskStatus(task.id, task.status)">
                     <option value="To Do" selected>To Do</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Done">Done</option>
@@ -105,18 +150,31 @@
           <p class="card-text">{{inProgressTaskCount}} task</p>
 
           <div *ngFor="let task of session?.tasks">
-            <div *ngIf="task.status === 'In Progress'" class="card mb-2" style="border: 1px solid rgb(39, 39, 39); border-left: 4px solid #552f86; border-radius: 8px;">
+            <div *ngIf="task.status === 'In Progress'" class="card mb-2 taskcard" style="border: 1px solid rgb(39, 39, 39); border-left: 4px solid #552f86; border-radius: 8px;">
               <div class="card-body" style="margin-bottom: 15px;">
+                <div class="d-flex justify-content-center mb-2 options" style="gap: 30px; cursor: pointer;">
+                  <a data-bs-toggle="modal" data-bs-target="#editTaskModal" (click)="tobeEditedTaskId = task.id; editedTaskModel = task">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                      <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                    </svg>
+                  </a>
+                  <a data-bs-toggle="modal" data-bs-target="#deleteTaskModal" (click)="tobeDeletedTaskId = task.id">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                      <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                    </svg>
+                  </a>
+                </div>
                 <div class="d-flex justify-content-between">
                   <h5 class="card-title" style="width: 80%;">{{task.title}}</h5>
-                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;"  [(ngModel)]="task.status" (ngModelChange)="updateTaskStatus(task.id, task.status)">
+                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;  font-size: 14px; padding-left: 10px;"  [(ngModel)]="task.status" (ngModelChange)="updateTaskStatus(task.id, task.status)">
                     <option value="To Do">To Do</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Done">Done</option>
                   </select>
                 </div>
                 <p class="card-text">{{task.description}}</p>
-                 <span class="spanP"><b>In Proggress</b></span>
+                <span class="spanP"><b>In Progress</b></span>
               </div>
               <div class="card-footer d-flex justify-content-between" style="height: 30px;">
                 <div class="d-flex align-items-center">
@@ -147,17 +205,31 @@
           <p class="card-text">{{doneTaskCount}} task</p>
 
           <div *ngFor="let task of session?.tasks">
-            <div *ngIf="task.status === 'Done'" class="card mb-2" style="border: 1px solid rgb(39, 39, 39); border-left: 4px solid #552f86; border-radius: 8px;">
+            <div *ngIf="task.status === 'Done'" class="card mb-2 taskcard" style="border: 1px solid rgb(39, 39, 39); border-left: 4px solid #552f86; border-radius: 8px;">
               <div class="card-body" style="margin-bottom: 15px;">
+                <div class="d-flex justify-content-center mb-2 options" style="gap: 30px; cursor: pointer;">
+                  <a data-bs-toggle="modal" data-bs-target="#editTaskModal" (click)="tobeEditedTaskId = task.id; editedTaskModel = task">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                      <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                    </svg>
+                  </a>
+                  <a data-bs-toggle="modal" data-bs-target="#deleteTaskModal" (click)="tobeDeletedTaskId = task.id">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                      <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                    </svg>
+                  </a>
+                </div>
                 <div class="d-flex justify-content-between">
                   <h5 class="card-title" style="width: 80%;">{{task.title}}</h5>
-                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;" [(ngModel)]="task.status" (ngModelChange)="updateTaskStatus(task.id, task.status)">
+                  <select class="form-select" style="width: 120px; height: 30px; font-size: 12px; padding: 2px;  font-size: 14px; padding-left: 10px;" [(ngModel)]="task.status" (ngModelChange)="updateTaskStatus(task.id, task.status)">
                     <option value="To Do">To Do</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Done">Done</option>
                   </select>
                 </div>
                 <p class="card-text">{{task.description}}</p>
+                <span class="spanDO"><b>Done</b></span>
               </div>
               <div class="card-footer d-flex justify-content-between" style="height: 30px;">
                 <div class="d-flex align-items-center">
@@ -216,6 +288,65 @@
       <div class="modal-footer d-flex justify-content-between">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-outline-primary" (click)="createTask()" data-bs-dismiss="modal">Add task</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Modal for deleting task-->
+<div class="modal fade" id="deleteTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete task</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this task?</p>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-outline-danger" (click)="deleteTask()" data-bs-dismiss="modal">Delete task</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Modal for editing task-->
+<div class="modal fade" id="editTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit task</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="editTaskTitle" class="form-label">Title:</label>
+            <input type="text" maxlength="50" class="form-control" id="editTaskTitle" placeholder="Enter title" [(ngModel)]="editedTaskModel.title" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="editTaskDescription" class="form-label">Description:</label>
+            <input type="text" maxlength="50" class="form-control" id="editTaskDescription" placeholder="Enter description" [(ngModel)]="editedTaskModel.description" name="description" required>  
+          </div>
+          <div class="mb-3">
+            <label for="editTaskDueDate" class="form-label">Due Date:</label>
+            <input type="date" class="form-control" id="editTaskDueDate" [(ngModel)]="editedTaskModel.dueDate" name="dueDate" required>
+          </div>
+          <div class="mb-3">
+              <select class="form-select" id="inputGroupSelect02" [(ngModel)]="assignedToUserName" name="assignedToUserName" aria-placeholder="Select user to assign" required>
+                  <option hidden>Select user to assign</option>
+                  <div *ngFor="let user of users">
+                    <option value="{{user.userName}}">{{user.userName}}</option>
+                  </div>
+              </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-outline-primary" (click)="editTask(editedTaskModel)" data-bs-dismiss="modal">Save changes</button>
       </div>
     </div>
   </div>

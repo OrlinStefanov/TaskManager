@@ -18,10 +18,15 @@ import { showAlert } from '../services/helper';
 
 export class SessionDetail {
   session : Sesison_Full | null = null;
+  userId : string;
   createdTaskModel : Task = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
+  editedTaskModel : Task = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
 
   assignedToUserName : string = "";
   users : UserSessionFull[] = [];
+
+  tobeDeletedTaskId: string | null = null;
+  tobeEditedTaskId: string | null = null;
 
   constructor(private route: ActivatedRoute, private authService: Auth) {}
 
@@ -47,13 +52,16 @@ export class SessionDetail {
     const assignedToUserId = this.users.find(user => user.userName === this.assignedToUserName).userId;
     if(!assignedToUserId) return;
 
+    this.userId = this.session?.userSessions.find(u => u.userName === this.authService.User)?.userId || '';
+    console.log('Current userId:', this.userId);
+
     const newTask: Task = {
       title: this.createdTaskModel.title,
       description: this.createdTaskModel.description,
       dueDate: this.createdTaskModel.dueDate,
       sessionId: this.session.id!,
       assignedToUserId: assignedToUserId,
-      createdByUserId: this.authService.userid,
+      createdByUserId: this.userId,
       status: 'To Do'
     };
 
@@ -62,10 +70,13 @@ export class SessionDetail {
     this.authService.createTask(this.session.id!, newTask).subscribe({
       next: (res) => {
         showAlert(this, 'success', 'Task created successfully!');
-        console.log('Task created:', res);
+        
+        var assignedToUserName = this.users.find(user => user.userId === res.assignedToUserId)?.userName || '';
+        res['assignedToUserName'] = assignedToUserName;
+
         this.createdTaskModel = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
-        this.assignedToUserName = '';
         this.session?.tasks?.push(res);
+        this.assignedToUserName = '';
       },
       error: (error) => {
         console.error('Error creating task:', error);
@@ -83,6 +94,45 @@ export class SessionDetail {
       },
       error: (error) => {
         console.error('Error updating task status:', error);
+      }
+    });
+  }
+
+  public deleteTask () {
+    if(!this.tobeDeletedTaskId) return;
+
+    this.authService.deleteTask(this.tobeDeletedTaskId).subscribe({
+      next: () => {
+        showAlert(this, 'success', 'Task deleted successfully!');
+
+        this.session!.tasks = this.session!.tasks.filter(t => t.id !== this.tobeDeletedTaskId);
+      },
+      error: (error) => {
+        console.error('Error deleting task:', error);
+      }
+    });
+  }
+
+  public editTask (task: Task) {
+    if(!task.id) return;
+
+    task.assignedToUserId = this.users.find(user => user.userName === this.assignedToUserName)?.userId || task.assignedToUserId;
+    task.createdByUserId = this.session?.userSessions.find(u => u.userName === this.authService.User)?.userId || task.createdByUserId;
+
+    this.authService.editTask(task.id, task).subscribe({
+      next: (res) => {
+        showAlert(this, 'success', 'Task edited successfully!');
+        const index = this.session!.tasks.findIndex(t => t.id === task.id);
+
+        if(index !== -1) {
+          this.session!.tasks[index] = res;
+        }
+
+        this.tobeEditedTaskId = null;
+        this.editedTaskModel = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
+      },
+      error: (error) => {
+        console.error('Error editing task:', error);
       }
     });
   }

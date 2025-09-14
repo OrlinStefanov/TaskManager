@@ -55,7 +55,9 @@ export class MainPage {
   //to store user sessions
   userSessions: UserSession[] = [];
 
-
+  //gets the done tasks
+  completedTasksCount: number = 0;
+  
   participants: { userName: string | null, userEmail: string | null, role: string }[] = [];
 
   public constructor(private authService : Auth) {}
@@ -90,6 +92,19 @@ export class MainPage {
         this.authService.setUser(null);
       }
     });
+
+    this.authService.getCompletedTasksCount(this.authService.User).subscribe({
+      next: (count) => {
+        this.completedTasksCount = count;
+        console.log('Completed tasks count:', count);
+        return count;
+      },
+      error: (err) => {
+        console.error('Error fetching completed tasks count:', err);
+        return 0;
+      }
+    });
+    return 0;
   }
 
   public addParticipant() {
@@ -305,18 +320,5 @@ export class MainPage {
 
   tobeDeletedSession(sessionId: string) {
     this.tobedeletedSessionId = sessionId;
-  }
-
-  get DoneTaskCount(): number {
-    this.authService.getCompletedTasksCount(this.userName).subscribe({
-      next: (count) => {
-        return count;
-      },
-      error: (err) => {
-        console.error('Error fetching completed tasks count:', err);
-        return 0;
-      }
-    });
-    return 0;
   }
 }

@@ -44,7 +44,7 @@ export interface Sesison_Full {
   title: string;
   description: string;
 
-  userSessions: UserSession[];
+  userSessions: UserSessionFull[];
 
   tasks: Task[];
 }
@@ -111,6 +111,11 @@ export class Auth {
     this.userSubject.next(username);
   }
 
+  //get current username
+  get User(): string | null {
+    return this.userSubject.value;
+  }
+
   //doesn't work yet
   logout(): Observable<any> {
     return this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true });
@@ -173,6 +178,16 @@ export class Auth {
 
   //get completed tasks count for a user
   getCompletedTasksCount(userName: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}"/tasks/completed/${userName}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+    return this.http.get(`${this.apiUrl}/tasks/completed/${userName}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  //delete task by id
+  deleteTask(taskId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/tasks/${taskId}`, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  //edit task by id
+  editTask(taskId: string, task: Task): Observable<any> {
+    return this.http.put(`${this.apiUrl}/tasks/${taskId}`, task, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
   }
 }
