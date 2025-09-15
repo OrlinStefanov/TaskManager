@@ -18,6 +18,7 @@ import { showAlert } from '../services/helper';
 
 export class SessionDetail {
   session : Sesison_Full | null = null;
+  displayed_tasks : Task[] | null = null;
   userId : string;
   createdTaskModel : Task = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
   editedTaskModel : Task = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
@@ -34,10 +35,14 @@ export class SessionDetail {
     const id = this.route.snapshot.paramMap.get('id');
     this.authService.getSessionById(id!).subscribe({
       next: (session) => {
-        console.log('Fetched session details:', session);
+
         this.session = session;
         this.users = session.userSessions;
         this.assignedToUserName = this.users.length > 0 ? this.users[0].userName : '';
+        
+        console.log('Fetched session details:', session);
+
+        this.displayed_tasks = [...(this.session?.tasks || [])];
       },
       error: (error) => {
         console.error('Error fetching session details:', error);
@@ -76,6 +81,7 @@ export class SessionDetail {
 
         this.createdTaskModel = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
         this.session?.tasks?.push(res);
+        this.displayed_tasks = this.session.tasks;
         this.assignedToUserName = '';
       },
       error: (error) => {
@@ -106,6 +112,7 @@ export class SessionDetail {
         showAlert(this, 'success', 'Task deleted successfully!');
 
         this.session!.tasks = this.session!.tasks.filter(t => t.id !== this.tobeDeletedTaskId);
+        this.displayed_tasks = this.session.tasks;
       },
       error: (error) => {
         console.error('Error deleting task:', error);
@@ -138,14 +145,74 @@ export class SessionDetail {
   }
 
   get todoTaskCount(): number {
-    return this.session?.tasks?.filter(t => t.status === "To Do").length ?? 0;
+    if (!this.displayed_tasks) return 0;
+    return this.displayed_tasks?.filter(t => t.status === "To Do").length ?? 0;
   }
 
   get inProgressTaskCount(): number {
-    return this.session?.tasks?.filter(t => t.status === "In Progress").length ?? 0;
+    if (!this.displayed_tasks) return 0;
+
+    return this.displayed_tasks.filter(t => t.status === "In Progress").length ?? 0;
   }
   
   get doneTaskCount(): number {
-    return this.session?.tasks?.filter(t => t.status === "Done").length ?? 0;
+    if (!this.displayed_tasks) return 0;
+    return this.displayed_tasks.filter(t => t.status === "Done").length ?? 0;
+  }
+
+  public filterTasksByUser(userName: string) {
+    if (userName === "All") {
+      this.displayed_tasks = this.session?.tasks || [];
+    } else {
+      this.displayed_tasks = this.session?.tasks.filter(t => t['assignedToUserName'] === userName) || [];
+    }
+  }
+
+  public SortBy(value : string)
+  {
+    if (!this.displayed_tasks) return;
+
+    if(value === "Created")
+    {
+      this.displayed_tasks.sort((a, b) => {
+        if (a.id && b.id) {
+          return a.id.localeCompare(b.id);
+        }
+        return 0;
+      });
+    }
+    else if(value === "DueDate")
+    {
+      this.displayed_tasks.sort((a, b) => {
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      });
+    } else if(value === "MostRecent")
+    {
+      this.displayed_tasks.sort((a, b) => {
+        if (a.id && b.id) {
+          return b.id.localeCompare(a.id);
+        }
+        return 0;
+      });
+    }
+  }
+
+  public isDueSoon(dueDate: Date): boolean {
+    const now = new Date();
+    const due = new Date(dueDate);
+    const timeDiff = due.getTime() - now.getTime();
+    const daysDiff = timeDiff / (1000 * 3600 * 24);
+    return daysDiff >= 0 && daysDiff <= 2;
+  }
+
+  public hasDueSoonTasks(): boolean {
+    if (!this.displayed_tasks) return false;
+    return this.displayed_tasks.some(task => this.isDueSoon(task.dueDate));
+  }
+
+  public formatTask(count : number)
+  {
+    if (count === 1) return "task";
+    return "tasks";
   }
 }

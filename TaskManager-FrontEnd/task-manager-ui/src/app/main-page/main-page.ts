@@ -202,8 +202,6 @@ export class MainPage {
       next: (sessions) => {
         this.load_Sessions = sessions;
         this.is_loading = true;
-
-        showAlert(this, 'success', 'Sessions retrieved successfully');
       },
       error: (err) => {
         showAlert(this, 'danger', err.error || 'Failed to retrieve sessions')
