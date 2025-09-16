@@ -60,6 +60,7 @@ export interface Task {
   assignedToUserId: string;
   createdByUserId: string;
   status: "To Do" | "In Progress" | "Done";
+  priority?: "Low" | "Medium" | "High";
 }
 
 export interface UserSessionFull {

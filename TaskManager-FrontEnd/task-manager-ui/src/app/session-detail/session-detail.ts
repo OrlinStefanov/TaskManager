@@ -19,9 +19,11 @@ import { showAlert } from '../services/helper';
 export class SessionDetail {
   session : Sesison_Full | null = null;
   displayed_tasks : Task[] | null = null;
+
   userId : string;
-  createdTaskModel : Task = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
-  editedTaskModel : Task = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
+
+  createdTaskModel : Task = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do', priority: 'Medium' };
+  editedTaskModel : Task = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do', priority: 'Medium' };
 
   assignedToUserName : string = "";
   users : UserSessionFull[] = [];
@@ -67,7 +69,8 @@ export class SessionDetail {
       sessionId: this.session.id!,
       assignedToUserId: assignedToUserId,
       createdByUserId: this.userId,
-      status: 'To Do'
+      status: 'To Do',
+      priority: this.createdTaskModel.priority || 'Medium'
     };
 
     console.log('Creating task with data:', newTask);
@@ -79,7 +82,7 @@ export class SessionDetail {
         var assignedToUserName = this.users.find(user => user.userId === res.assignedToUserId)?.userName || '';
         res['assignedToUserName'] = assignedToUserName;
 
-        this.createdTaskModel = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
+        this.createdTaskModel = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do', priority: 'Medium' };
         this.session?.tasks?.push(res);
         this.displayed_tasks = this.session.tasks;
         this.assignedToUserName = '';
@@ -122,6 +125,7 @@ export class SessionDetail {
 
   public editTask (task: Task) {
     if(!task.id) return;
+    if (!task.dueDate) task.dueDate = new Date();
 
     task.assignedToUserId = this.users.find(user => user.userName === this.assignedToUserName)?.userId || task.assignedToUserId;
     task.createdByUserId = this.session?.userSessions.find(u => u.userName === this.authService.User)?.userId || task.createdByUserId;
@@ -133,10 +137,11 @@ export class SessionDetail {
 
         if(index !== -1) {
           this.session!.tasks[index] = res;
+          this.displayed_tasks = this.session!.tasks;
         }
 
         this.tobeEditedTaskId = null;
-        this.editedTaskModel = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do' };
+        this.editedTaskModel = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do', priority: 'Medium' };
       },
       error: (error) => {
         console.error('Error editing task:', error);
@@ -194,6 +199,12 @@ export class SessionDetail {
         }
         return 0;
       });
+    } else if(value === "Priority")
+    {
+      const priorityOrder = { 'High': 1, 'Medium': 2, 'Low': 3 };
+      this.displayed_tasks.sort((a, b) => {
+        return (priorityOrder[a.priority || 'Medium'] || 2) - (priorityOrder[b.priority || 'Medium'] || 2);
+      });
     }
   }
 
@@ -205,6 +216,17 @@ export class SessionDetail {
     return daysDiff >= 0 && daysDiff <= 2;
   }
 
+  public isOverdue(dueDate: Date): boolean {
+    const now = new Date();
+    const due = new Date(dueDate);
+    return due < now;
+  }
+
+  public hasOverdueTasks(): boolean {
+    if (!this.displayed_tasks) return false;
+    return this.displayed_tasks.some(task => this.isOverdue(task.dueDate));
+  }
+
   public hasDueSoonTasks(): boolean {
     if (!this.displayed_tasks) return false;
     return this.displayed_tasks.some(task => this.isDueSoon(task.dueDate));
@@ -214,5 +236,18 @@ export class SessionDetail {
   {
     if (count === 1) return "task";
     return "tasks";
+  }
+
+  public formatDateForInput(date: string | Date): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  public resetEditedTaskModel() {
+    this.editedTaskModel = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do', priority: 'Medium' };
+    this.tobeEditedTaskId = null;
   }
 }

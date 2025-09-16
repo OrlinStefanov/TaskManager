@@ -12,6 +12,7 @@
 		public Guid SessionId { get; set; }
 
 		public string? Status { get; set; } = "To Do"; // Possible values: To Do, In Progress, Done
+		public string? Priority { get; set; } = "Low"; // Possible values: Low, Medium, High
 
 		public ApplicationUser? AssignedToUser { get; set; }
 		public ApplicationUser? CreatedByUser { get; set; }

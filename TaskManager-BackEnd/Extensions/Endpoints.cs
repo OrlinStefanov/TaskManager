@@ -417,7 +417,8 @@ namespace TaskManager.Extensions
 				await db.SaveChangesAsync();
 				return Results.Ok("Session restored successfully.");
 			}).WithSummary("Restores a soft-deleted session by its ID");
-			
+
+			//IMPLEMENTING TASKS-----------------------------------------------------			
 			//get all data for a session by id
 			app.MapGet("/sessions_all/{id}", async(Guid id, ApplicationDbContext db) =>
 				{
@@ -453,6 +454,7 @@ namespace TaskManager.Extensions
 							t.Description,
 							t.DueDate,
 							t.Status,
+							t.Priority,
 							CreatedByUsername = t.CreatedByUser?.UserName ?? "Unknown",
 							AssignedToUserName = t.AssignedToUser?.UserName ?? "Unassigned"
 						}).ToList()
@@ -492,6 +494,7 @@ namespace TaskManager.Extensions
 					AssignedToUserId = task_model.AssignedToUserId,
 					CreatedByUserId = task_model.CreatedByUserId,
 					Status = "To Do",
+					Priority = task_model.Priority ?? "Low",
 				};
 
 				db.TaskItems.Add(newTask);
@@ -580,6 +583,7 @@ namespace TaskManager.Extensions
 				task.DueDate = updatedTask.DueDate;
 				task.AssignedToUserId = updatedTask.AssignedToUserId;
 				task.Status = updatedTask.Status;
+				task.Priority = updatedTask.Priority;
 
 				task.AssignedToUser = await db.Users.FirstOrDefaultAsync(u => u.Id == updatedTask.AssignedToUserId);
 				task.CreatedByUser = await db.Users.FirstOrDefaultAsync(u => u.Id == updatedTask.CreatedByUserId);
@@ -596,12 +600,32 @@ namespace TaskManager.Extensions
 					task.DueDate,
 					task.Status,
 					task.SessionId,
+					task.Priority,
 					CreatedByUsername = task.CreatedByUser?.UserName ?? "Unknown",
 					AssignedToUserName = task.AssignedToUser?.UserName ?? "Unassigned"
 				};
 
 				return Results.Ok(result);
 			}).WithSummary("Edits a task by its ID");
+
+			//change priority of task
+			app.MapPut("/tasks/{taskId}/priority", async (Guid taskId, [FromBody] string newPriority, ApplicationDbContext db) =>
+			{
+				var task = await db.TaskItems.FirstOrDefaultAsync(t => t.Id == taskId);
+				if (task == null)
+				{
+					return Results.NotFound("Task not found.");
+				}
+				var validPriorities = new List<string> { "Low", "Medium", "High" };
+				if (!validPriorities.Contains(newPriority))
+				{
+					return Results.BadRequest("Invalid priority. Valid priorities are: Low, Medium, High.");
+				}
+				task.Priority = newPriority;
+				db.TaskItems.Update(task);
+				await db.SaveChangesAsync();
+				return Results.Ok("Task priority updated successfully.");
+			}).WithSummary("Updates the priority of a task by its ID");
 		}
 	}
 }
