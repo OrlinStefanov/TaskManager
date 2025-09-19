@@ -54,7 +54,7 @@ export interface Task {
   title: string;
   description: string;
 
-  dueDate: Date;
+  dueDate: string | Date;
   sessionId: string;
 
   assignedToUserId: string;

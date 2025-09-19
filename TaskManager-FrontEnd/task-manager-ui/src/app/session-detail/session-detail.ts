@@ -123,9 +123,14 @@ export class SessionDetail {
     });
   }
 
-  public editTask (task: Task) {
-    if(!task.id) return;
+  public editTask(task: Task) {
+    if (!task.id) return;
     if (!task.dueDate) task.dueDate = new Date();
+
+    // Convert dueDate string (yyyy-MM-dd) to Date or ISO string before sending
+    if (typeof task.dueDate === 'string') {
+      task.dueDate = new Date(task.dueDate);
+    }
 
     task.assignedToUserId = this.users.find(user => user.userName === this.assignedToUserName)?.userId || task.assignedToUserId;
     task.createdByUserId = this.session?.userSessions.find(u => u.userName === this.authService.User)?.userId || task.createdByUserId;
@@ -208,7 +213,7 @@ export class SessionDetail {
     }
   }
 
-  public isDueSoon(dueDate: Date): boolean {
+  public isDueSoon(dueDate: Date | string): boolean {
     const now = new Date();
     const due = new Date(dueDate);
     const timeDiff = due.getTime() - now.getTime();
@@ -216,7 +221,7 @@ export class SessionDetail {
     return daysDiff >= 0 && daysDiff <= 2;
   }
 
-  public isOverdue(dueDate: Date): boolean {
+  public isOverdue(dueDate: Date | string): boolean {
     const now = new Date();
     const due = new Date(dueDate);
     return due < now;
@@ -249,5 +254,15 @@ export class SessionDetail {
   public resetEditedTaskModel() {
     this.editedTaskModel = { title: '', description: '', dueDate: new Date(), sessionId: '', assignedToUserId: '', createdByUserId: '', status: 'To Do', priority: 'Medium' };
     this.tobeEditedTaskId = null;
+  }
+
+  public inistiateEditTask(task: Task) {
+    this.tobeEditedTaskId = task.id || null;
+    this.editedTaskModel = { ...task };
+
+    if (this.editedTaskModel.dueDate) {
+      const date = new Date(this.editedTaskModel.dueDate);
+      this.editedTaskModel.dueDate = date.toISOString().slice(0, 10);
+    }
   }
 }
