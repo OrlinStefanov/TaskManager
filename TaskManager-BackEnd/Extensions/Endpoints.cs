@@ -445,6 +445,7 @@ namespace TaskManager.Extensions
 							us.SessionId,
 							us.SessionName,
 							UserName = us.User?.UserName ?? "",
+							UserEmail = us.User?.Email ?? "No Email",
 							us.Role
 						}).ToList(),
 						Tasks = session.Tasks?.Select(t => new

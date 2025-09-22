@@ -43,23 +43,40 @@
         <div class="col-md-12 text-center">
           <h4 *ngIf="!is_loading" style="margin-top: 20%;" class="text-secondary">You don't have any sessions. Once you create one it will be displayed here.</h4>
           <!--If there are sessions-->
-          <div *ngIf="is_loading" class="row row-cols-md-5 g-5" style="margin-top: 20px;">
-            <div *ngFor="let l_session of load_Sessions" class="col">
-              <a [routerLink]="['/sessions', l_session.id]" style="text-decoration: none; color: inherit;">
-                <div class="card">
-                  <span class="imgD"></span>
-                  <div class="card-body">
-                    <h5 class="card-title">{{l_session.title}}</h5>
-                    <p class="card-text">{{l_session.description}}</p>
-                  </div>
-                  <div class="card-footer text-end">
-                    <a (click)="deleteSession(l_session.id, $event)" id="btn_delete" style="text-decoration: none; color: inherit;" title="Remove session">
-                      <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
-                    </a>
+          <div *ngIf="is_loading" class="row row-cols-md-12 g-2 align-items-center justify-content-center" style="margin-top: 20px;">
+            <div *ngFor="let l_session of load_Sessions" class="col" width="500px;">
+              <a [routerLink]="['/sessions', l_session.id]" style="text-decoration: none; color: inherit; width: 480px;">
+                <div class="card d-flex flex-row p-2" style="width: 500px;">
+                  <span class="imgD me-3"></span>
+
+                  <div class="card-body text-start p-0" style="margin-top: 5px;">
+                    <div style="margin-bottom: 50px;">
+                      <h5 class="card-title">{{ l_session.title }}</h5>
+                      <hr>
+                      <p class="card-text" style="margin-top: 20px; height: 50px;">{{ l_session.description }}</p>
+                    </div>
+
+                    <hr>
+                    <div class="d-flex flex-row flex-wrap align-items-center mt-3">
+                        <div *ngFor="let p of l_session.userSessions | slice:0:5" class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center avatar-overlap"
+                            style="width:32px; height:32px;" [title]="p.userName + ' (' + p.role + ')'">
+                          {{ p.userName?.charAt(0).toUpperCase() }}
+                        </div>
+                        <div *ngIf="l_session.userSessions.length > 5"
+                            class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center avatar-overlap"
+                            style="width:32px; height:32px;">
+                          +{{ l_session.userSessions.length - 5 }}
+                        </div>
+                    </div>
+
+                      <div class="mt-auto d-flex justify-content-between" style="position: relative; top: 70px;">
+                        <a (click)="deleteSession(l_session.id, $event)" id="btn_delete" style="text-decoration: none; color: inherit;" title="Remove session">
+                          <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
+                        </a>
+                      </div>
                   </div>
                 </div>
-              </a>
-  
+              </a>  
             </div>
           </div> 
         </div>
