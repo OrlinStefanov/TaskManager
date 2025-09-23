@@ -26,6 +26,7 @@ export interface UserSession {
   sessionName: string;
 
   userName: string;
+  userEmail: string;
 
   role: "Admin" | "User" | "Creator";
 }
@@ -190,5 +191,17 @@ export class Auth {
   //edit task by id
   editTask(taskId: string, task: Task): Observable<any> {
     return this.http.put(`${this.apiUrl}/tasks/${taskId}`, task, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  //edit session
+  editSession(session_id: string, sesison : Session)
+  {
+    return this.http.put(`${this.apiUrl}/session/edit/${session_id}`, sesison, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  //leave session that you participated in(Creator can't leave)
+  delete_userSession(session_id : string, user_name: string)
+  {
+    return this.http.delete(`${this.apiUrl}/user_session/${session_id}/${user_name}`, { withCredentials: true, headers: { 'Content-Type': 'application/json'}});
   }
 }

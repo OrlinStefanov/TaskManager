@@ -47,6 +47,12 @@ hr {
     display: block;
 }
 
+#btn_delete:hover {
+    transform: scale(1.2);
+    transition: all 0.3s ease-in-out;
+    color: red;
+}
+
 .inactive {
   opacity: 0.5;               /* make transparent */
   filter: grayscale(30%);     /* slightly gray */    /* prevent interactions if needed */
@@ -127,6 +133,10 @@ a {
 
 .avatar-overlap:first-child {
   margin-left: 0;          
+}
+
+.members:hover {
+    background-color: #1f1f2c;
 }
 
 @media screen and (max-width: 768px) {

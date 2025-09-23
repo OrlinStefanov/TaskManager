@@ -57,6 +57,12 @@ export class MainPage {
 
   //gets the done tasks
   completedTasksCount: number = 0;
+
+  //to show members
+  to_show_members : UserSession[] = [];
+
+  //to edit sesion
+  to_edit_session : Session;
   
   participants: { userName: string | null, userEmail: string | null, role: string }[] = [];
 
@@ -80,6 +86,7 @@ export class MainPage {
         this.userSessions.push({
           sessionName: this.session.title,
           userName: user.userName || '',
+          userEmail: user.userEmail || '',
           role: "Creator"
         });
 
@@ -135,6 +142,7 @@ export class MainPage {
         this.userSessions.push({
           sessionName: this.session.title,
           userName: user.userName || '',
+          userEmail: user.userEmail || '',
           role: this.user_data.role
         })
 
@@ -202,8 +210,6 @@ export class MainPage {
       next: (sessions) => {
         this.load_Sessions = sessions;
         this.is_loading = true;
-
-        console.log('Sessions retrieved:', sessions);
       },
       error: (err) => {
         showAlert(this, 'danger', err.error || 'Failed to retrieve sessions')
@@ -217,8 +223,6 @@ export class MainPage {
       next: (sessions) => {
         this.participate_Sessions = sessions;
         this.participate_loading = true;
-
-        showAlert(this, 'success', 'Participate Sessions retrieved successfully');
       },
       error: (err) => {
         showAlert(this, 'danger', err.error || 'Failed to retrieve participate sessions')
@@ -232,7 +236,6 @@ export class MainPage {
     event.stopPropagation();
     this.authService.deleteSession(sessionId).subscribe({
       next: () => {
-        showAlert(this, 'success', 'Session deleted successfully');
 
         this.archive_loading = true;
 
@@ -273,7 +276,7 @@ export class MainPage {
       next: (sessions) => {
         this.archive_Sessions = sessions;
         this.archive_loading = true;
-        showAlert(this, 'success', 'Deleted sessions retrieved successfully');
+
         this.getCurrentUserSessions();
       },
       error: (err) => {
@@ -316,6 +319,80 @@ export class MainPage {
         showAlert(this, 'danger', 'Failed to logout');
       }
     });
+  }
+
+  public ShowMembers(event : MouseEvent, us : UserSession[])
+  {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.to_show_members = us;
+  }
+
+  public EditSession(event : MouseEvent, s : Session)
+  {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.session = s;
+
+    this.participants = this.session.userSessions.map(us => ({
+      userName: us.userName || null,
+      userEmail: us.userEmail || null,
+      role: us.role
+    }))
+  }
+
+  public initiateEditSession()
+  {
+    this.session = {
+      title: '',
+      description: '',
+      userSessions: []
+    };
+
+    this.participants = [{
+      userName: this.userName,
+      userEmail: this.userEmail,
+      role: this.user_data.role
+    }];
+  }
+
+  //you can leave only if you are a participant in a session(Creator can't leave)
+  public leaveSession(session_id : string, user_name : string, event : MouseEvent)
+  {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.authService.delete_userSession(session_id, user_name).subscribe({
+      next : () => {
+        this.participate_Sessions.filter(s => s.id !== session_id);
+      },
+      error : (err) =>
+      {
+        console.log(err);
+      } 
+    })
+  }
+
+  //edit session by id
+  public editSession(session_id : string, sesion : Session)
+  {
+    for (let i = 0; i < this.userSessions.length; i ++)
+    {
+      this.userSessions[i].sessionName = this.session.title;
+    }
+    sesion.userSessions = this.userSessions;
+
+    this.authService.editSession(session_id, sesion).subscribe({
+      next : (updatedSession) => {
+        const index = this.load_Sessions.findIndex(s => s.id === session_id);
+
+        if (index !== -1) {
+          this.load_Sessions[index] = updatedSession as Session;
+        }
+        }
+    })
   }
 
   tobeDeletedSession(sessionId: string) {

@@ -16,5 +16,6 @@ namespace TaskManager.DTO
 		public string? SessionName { get; set; }
 		public string? UserName { get; set; }
 		public string? Role { get; set; }
+		public string? UserEmail { get; internal set; }
 	}
 }

@@ -17,7 +17,7 @@
       <div class="mx-auto search_bar">
         <div class="input-group" style="width: 50%; margin-left: 23%;">
           <input type="text" class="form-control" placeholder="Create sessions and enjoy working easier" aria-label="Search" disabled>
-          <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+          <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="initiateEditSession()">
             Create
           </button>
         </div>
@@ -45,33 +45,49 @@
           <!--If there are sessions-->
           <div *ngIf="is_loading" class="row row-cols-md-12 g-2 align-items-center justify-content-center" style="margin-top: 20px;">
             <div *ngFor="let l_session of load_Sessions" class="col" width="500px;">
-              <a [routerLink]="['/sessions', l_session.id]" style="text-decoration: none; color: inherit; width: 480px;">
+              <a [routerLink]="['/sessions', l_session.id]" style="text-decoration: none; display: inline-block; color: inherit; width: 480px !important;">
                 <div class="card d-flex flex-row p-2" style="width: 500px;">
                   <span class="imgD me-3"></span>
 
                   <div class="card-body text-start p-0" style="margin-top: 5px;">
                     <div style="margin-bottom: 50px;">
-                      <h5 class="card-title">{{ l_session.title }}</h5>
+                      <h4 class="card-title">{{ l_session.title }}</h4>
                       <hr>
                       <p class="card-text" style="margin-top: 20px; height: 50px;">{{ l_session.description }}</p>
                     </div>
 
                     <hr>
                     <div class="d-flex flex-row flex-wrap align-items-center mt-3">
-                        <div *ngFor="let p of l_session.userSessions | slice:0:5" class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center avatar-overlap"
+                        <div *ngFor="let p of l_session.userSessions | slice:0:3" class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center avatar-overlap"
                             style="width:32px; height:32px;" [title]="p.userName + ' (' + p.role + ')'">
                           {{ p.userName?.charAt(0).toUpperCase() }}
                         </div>
-                        <div *ngIf="l_session.userSessions.length > 5"
+                        <div *ngIf="l_session.userSessions.length > 3"
                             class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center avatar-overlap"
                             style="width:32px; height:32px;">
-                          +{{ l_session.userSessions.length - 5 }}
+                          +{{ l_session.userSessions.length - 3}}
+                        </div>
+                        <div style="margin-left: 20px;">
+                            <button class="btn btn-outline-secondary me-2" (click)="ShowMembers($event, l_session.userSessions)" data-bs-toggle="modal" data-bs-target="#members">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                                <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
+                              </svg>
+                              {{l_session?.userSessions.length}} members
+                            </button>
                         </div>
                     </div>
 
-                      <div class="mt-auto d-flex justify-content-between" style="position: relative; top: 70px;">
-                        <a (click)="deleteSession(l_session.id, $event)" id="btn_delete" style="text-decoration: none; color: inherit;" title="Remove session">
-                          <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
+                      <div class="mt-auto d-flex justify-content-end" style="position: relative; top: 50px;">
+                        <a data-bs-toggle="modal" data-bs-target="#editsession" (click)="EditSession($event, l_session)" title="Edit Session" style="margin-right: 10px; color: grey;" id="btn_delete">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                          </svg>
+                        </a>
+                        <a style="color: red;" data-bs-target="#deleteTaskModal" (click)="deleteSession(l_session.id, $event)" title="Delete Session" id="btn_delete">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                          </svg>
                         </a>
                       </div>
                   </div>
@@ -87,14 +103,48 @@
         <div class="col-md-12 text-center">
           <h4 *ngIf="!participate_loading" style="margin-top: 20%;" class="text-secondary">You don't participate in any sessions. Once someone invites you sessions will appear here.</h4>
           <!--If there are sessions-->
-          <div *ngIf="participate_loading" class="row row-cols-md-5 g-5" style="margin-top: 20px;">
+          <div *ngIf="participate_loading" class="row row-cols-md-12 g-2 align-items-center justify-content-center" style="margin-top: 20px;">
             <div *ngFor="let p_session of participate_Sessions" class="col">
               <a [routerLink]="['/sessions', p_session.id]" style="text-decoration: none; color: inherit;">
-                <div class="card">
-                  <span class="imgD"></span>
-                  <div class="card-body">
-                    <h5 class="card-title">{{p_session.title}}</h5>
-                    <p class="card-text">{{p_session.description}}</p>
+                <div class="card d-flex flex-row p-2" style="width: 500px;">
+                  <span class="imgD me-3"></span>
+
+                  <div class="card-body text-start p-0" style="margin-top: 5px;">
+                    <div style="margin-bottom: 50px;">
+                      <h4 class="card-title">{{ p_session.title }}</h4>
+                      <hr>
+                      <p class="card-text" style="margin-top: 20px; height: 50px;">{{ p_session.description }}</p>
+                    </div>
+
+                    <hr>
+                    <div class="d-flex flex-row flex-wrap align-items-center mt-3">
+                        <div *ngFor="let p of p_session.userSessions | slice:0:3" class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center avatar-overlap"
+                            style="width:32px; height:32px;" [title]="p.userName + ' (' + p.role + ')'">
+                          {{ p.userName?.charAt(0).toUpperCase() }}
+                        </div>
+                        <div *ngIf="p_session.userSessions.length > 3"
+                            class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center avatar-overlap"
+                            style="width:32px; height:32px;">
+                          +{{ p_session.userSessions.length - 3}}
+                        </div>
+                        <div style="margin-left: 20px;">
+                            <button class="btn btn-outline-secondary me-2" (click)="ShowMembers($event, p_session.userSessions)" data-bs-toggle="modal" data-bs-target="#members">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                                <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
+                              </svg>
+                              {{p_session?.userSessions.length}} members
+                            </button>
+                        </div>
+                    </div>
+
+                      <div class="mt-auto d-flex justify-content-end" style="position: relative; top: 50px;">
+                        <a style="color: red;" data-bs-target="#deleteTaskModal" (click)="leaveSession(p_session.id, userName, $event)" title="Leave Session" id="btn_delete">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+                          </svg>
+                        </a>
+                      </div>
                   </div>
                 </div>
               </a>  
@@ -208,6 +258,95 @@
       <div class="modal-footer d-flex justify-content-between">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" (click)="hardDeleteSession($event)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Editing a session-->
+<div class="modal fade modal" id="editsession" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div *ngIf="message" class="text-center" [ngClass]="'alert alert-' + alertType + ' d-flex align-items-center'" role="alert" style="width: 50%; margin: 0 auto; margin-top: 20px;">
+      {{ message }}
+    </div>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Edit session:</h1>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="sessionName" class="form-label">Session Name:</label>
+            <input type="text" maxlength="15" class="form-control" id="sessionName" placeholder="Enter session name" [(ngModel)]="session.title" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="sessionDescription" class="form-label">Session Description:</label>
+            <textarea class="form-control" maxlength="40" id="sessionDescription" rows="3" placeholder="Enter session description" [(ngModel)]="session.description" name="description"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="sessionUsers" class="form-label">Participants:</label>
+            <div class="input-group mb-3">
+                <div *ngFor="let p of participants" class="d-flex align-items-center rounded mb-3 participant">
+                  <div class="me-3 bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center"
+                      style="width: 32px; height: 32px; margin-left: 20px;">
+                    {{p.userName?.charAt(0).toUpperCase()}}
+                  </div>
+                  <div class="flex-grow-1">
+                    <div>{{p.userName}}</div>
+                    <small class="text" style="color: #b4b1b1;">{{p.userEmail}}</small>
+                  </div>
+                  <span class="badge bg-primary" style="margin-right: 20px;">{{p.role}}</span>
+                  <a style="color: red; font-size: medium;" (click)="removeParticipant(p)"> <bold>X</bold></a>
+                </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="addingUsers" class="form-label">Add Users</label>
+            <div class="row g-2">
+              <div class="col-md"> 
+                <input type="text" class="form-control" id="addingUsers" placeholder="Enter user email or username" required [(ngModel)]="user_data.userNameOrEmail" name="userNameOrEmail">
+                <div class="input-group mb-3">
+                  <select class="form-select" id="inputGroupSelect01" [(ngModel)]="user_data.role" name="role">
+                    <option selected disabled>Choose role</option>
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline-primary" style="margin-left: 88%;" (click)="addParticipant()">Add User</button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" (click)="editSession(session.id, session)">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Modal for participants-->
+<div class="modal fade" tabindex="-1" id="members" aria-labelledby="members" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Session members</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let p of to_show_members">
+          <div class="d-flex align-items-center rounded flex-grow-1 members" style="margin-bottom: 30px; height: 60px;">
+            <div class="me-3 bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center"
+                style="width: 40px; height: 40px; margin-left: 20px; font-size: 20px;">
+              {{p.userName?.charAt(0).toUpperCase()}}
+            </div>
+            <div class="flex-grow-1" style="font-size: 18px;">
+              <div>{{p.userName}}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

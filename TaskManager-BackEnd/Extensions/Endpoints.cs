@@ -245,11 +245,12 @@ namespace TaskManager.Extensions
 					Id = s.Id,
 					Title = s.Title,
 					Description = s.Description,
-					UserSessions = s.UserSessions.Select(us => new MinimalUserSessionDTO
+					UserSessions = s.UserSessions?.Select(us => new MinimalUserSessionDTO
 					{
 						SessionId = us.SessionId,
 						SessionName = us.SessionName,
 						UserName = us.User?.UserName ?? "",
+						UserEmail = us.User?.Email ?? "",
 						Role = us.Role ?? "User"
 					}).ToList()
 				}).Reverse();
@@ -627,6 +628,92 @@ namespace TaskManager.Extensions
 				await db.SaveChangesAsync();
 				return Results.Ok("Task priority updated successfully.");
 			}).WithSummary("Updates the priority of a task by its ID");
+
+			//member leaves sesion
+			app.MapDelete("/user_session/{session_id}/{user_name}", async (Guid session_id, string user_name, ApplicationDbContext db) =>
+			{
+				var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == user_name);
+
+				if (user == null) return Results.BadRequest("Can't find user");
+
+				var user_session = await db.UserSessions.FirstOrDefaultAsync(s => s.SessionId.Equals(session_id) && s.UserId.Equals(user.Id));
+
+				if (user_session == null) return Results.NotFound("No user participating in this session is found");
+
+				if (user_session.Role == "Creator") return Results.BadRequest("Creator can't leave his session. He can just delete it");
+
+				db.UserSessions.Remove(user_session);
+				await db.SaveChangesAsync();
+
+				return Results.Ok("User Session deleted successfully");
+			}).WithSummary("Removes a memeber from a participated session");
+
+			//edit session 
+			app.MapPut("/session/edit/{session_id}", async (Guid session_id, MinimalSessionDTO model, ApplicationDbContext db) =>
+			{
+				if (string.IsNullOrEmpty(model.Title) || string.IsNullOrEmpty(model.Description))
+				{
+					return Results.BadRequest("You have to add title and description");
+				}
+
+				var session = await db.Sessions
+					.Include(s => s.UserSessions)
+					.FirstOrDefaultAsync(s => s.Id == session_id);
+
+				if (session == null)
+				{
+					return Results.NotFound($"Session with id {session_id} not found");
+				}
+
+				session.Title = model.Title;
+				session.Description = model.Description;
+				session.IsDeleted = false;
+
+				if (model.UserSessions == null || model.UserSessions.Count == 0)
+				{
+					return Results.BadRequest("Can't have zero members");
+				}
+
+				if (session.UserSessions != null) session.UserSessions.Clear();
+
+				foreach (var user_session in model.UserSessions)
+				{
+					var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == user_session.UserName);
+
+					if (user == null)
+					{
+						return Results.BadRequest($"User {user_session.UserName} not found");
+					}
+
+					var newUserSession = new UserSession
+					{
+						SessionId = session_id,
+						UserId = user.Id,
+						Role = user_session.Role,
+						User = user,
+						SessionName = user_session.SessionName,
+					};
+
+					session.UserSessions.Add(newUserSession);
+				}
+
+				await db.SaveChangesAsync();
+
+				return Results.Ok(new MinimalSessionDTO
+				{
+					Id = session.Id,
+					Title = session.Title,
+					Description = session.Description,
+					UserSessions = session.UserSessions
+					.Select(us => new MinimalUserSessionDTO
+					{
+						UserName = us.User.UserName,
+						Role = us.Role,
+						SessionName = us.SessionName
+					})
+					.ToList()
+				});
+			});
 		}
 	}
 }
