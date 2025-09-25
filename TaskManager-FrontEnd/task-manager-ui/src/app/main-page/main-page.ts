@@ -340,7 +340,7 @@ export class MainPage {
       userName: us.userName || null,
       userEmail: us.userEmail || null,
       role: us.role
-    }))
+    }));
   }
 
   public initiateEditSession()
@@ -366,7 +366,10 @@ export class MainPage {
 
     this.authService.delete_userSession(session_id, user_name).subscribe({
       next : () => {
-        this.participate_Sessions.filter(s => s.id !== session_id);
+
+        if (this.participate_Sessions.length === 1) this.participate_loading = false;
+
+        this.participate_Sessions = this.participate_Sessions.filter(s => s.id !== session_id);
       },
       error : (err) =>
       {
@@ -378,10 +381,13 @@ export class MainPage {
   //edit session by id
   public editSession(session_id : string, sesion : Session)
   {
-    for (let i = 0; i < this.userSessions.length; i ++)
-    {
-      this.userSessions[i].sessionName = this.session.title;
-    }
+    this.userSessions = this.participants.map(p => ({
+      sessionName: this.session.title,
+      userName: p.userName ?? "", 
+      userEmail: p.userEmail ?? "",
+      role: p.role as "Admin" | "User" | "Creator"
+    }));
+
     sesion.userSessions = this.userSessions;
 
     this.authService.editSession(session_id, sesion).subscribe({
@@ -391,7 +397,9 @@ export class MainPage {
         if (index !== -1) {
           this.load_Sessions[index] = updatedSession as Session;
         }
-        }
+
+        this.participants = null;
+      }
     })
   }
 

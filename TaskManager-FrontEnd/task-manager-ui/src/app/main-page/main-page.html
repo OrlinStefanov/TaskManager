@@ -44,8 +44,8 @@
           <h4 *ngIf="!is_loading" style="margin-top: 20%;" class="text-secondary">You don't have any sessions. Once you create one it will be displayed here.</h4>
           <!--If there are sessions-->
           <div *ngIf="is_loading" class="row row-cols-md-12 g-2 align-items-center justify-content-center" style="margin-top: 20px;">
-            <div *ngFor="let l_session of load_Sessions" class="col" width="500px;">
-              <a [routerLink]="['/sessions', l_session.id]" style="text-decoration: none; display: inline-block; color: inherit; width: 480px !important;">
+            <div *ngFor="let l_session of load_Sessions" class="col">
+              <a [routerLink]="['/sessions', l_session.id]" style="text-decoration: none; color: inherit;">
                 <div class="card d-flex flex-row p-2" style="width: 500px;">
                   <span class="imgD me-3"></span>
 
@@ -161,19 +161,44 @@
           <div *ngIf="archive_loading" class="row row-cols-md-5 g-5" style="margin-top: 20px;">
             <div *ngFor="let a_session of archive_Sessions" class="col">
               <a style="text-decoration: none; color: inherit;">
-                <div class="inactive card">
-                  <span class="imgD"></span>
-                  <div class="card-body">
-                    <h5 class="card-title">{{a_session.title}}</h5>
-                    <p class="card-text">{{a_session.description}}</p>
-                  </div>
-                  <div class="card-footer d-flex justify-content-between mt-2">
-                    <a (click)="restoreSession(a_session.id, $event)" id="btn_restore" id="btn_delete" style="text-decoration: none; color: inherit; margin-right: 10px;" title="Restore session">
-                      <img src="assets/Images/undo.png" alt="Profile photo" width="20" height="20"/>
-                    </a>
-                    <a (click)="tobeDeletedSession(a_session.id)" data-bs-toggle="modal" data-bs-target="#checking" id="btn_delete" style="text-decoration: none; color: inherit;" title="Delete session">
-                      <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
-                    </a>
+                <div class="card d-flex flex-row p-2" style="width: 500px;">
+                  <span class="imgD me-3"></span>
+
+                  <div class="card-body text-start p-0" style="margin-top: 5px;">
+                    <div style="margin-bottom: 50px;">
+                      <h4 class="card-title">{{ a_session.title }}</h4>
+                      <hr>
+                      <p class="card-text" style="margin-top: 20px; height: 50px;">{{ a_session.description }}</p>
+                    </div>
+
+                    <hr>
+                    <div class="d-flex flex-row flex-wrap align-items-center mt-3">
+                        <div *ngFor="let p of a_session.userSessions | slice:0:3" class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center avatar-overlap"
+                            style="width:32px; height:32px;" [title]="p.userName + ' (' + p.role + ')'">
+                          {{ p.userName?.charAt(0).toUpperCase() }}
+                        </div>
+                        <div *ngIf="a_session.userSessions.length > 3"
+                            class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center avatar-overlap"
+                            style="width:32px; height:32px;">
+                          +{{ a_session.userSessions.length - 3}}
+                        </div>
+                        <div style="margin-left: 20px;">
+                            <button class="btn btn-outline-secondary me-2" (click)="ShowMembers($event, a_session.userSessions)" data-bs-toggle="modal" data-bs-target="#members">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                                <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
+                              </svg>
+                              {{a_session?.userSessions.length}} members
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-auto d-flex justify-content-end" style="position: relative; top: 50px;">
+                      <a (click)="restoreSession(a_session.id, $event)" id="btn_restore" id="btn_delete" style="text-decoration: none; color: inherit; margin-right: 10px;" title="Restore session">
+                        <img src="assets/Images/undo.png" alt="Profile photo" width="20" height="20"/>
+                      </a>
+                      <a (click)="tobeDeletedSession(a_session.id)" data-bs-toggle="modal" data-bs-target="#checking" id="btn_delete" style="text-decoration: none; color: inherit;" title="Delete session">
+                        <img src="assets/Images/bin.png" alt="Profile photo" width="20" height="20"/>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </a>  
