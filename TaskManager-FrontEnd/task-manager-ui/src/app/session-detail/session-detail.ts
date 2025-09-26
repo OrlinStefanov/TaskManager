@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Auth, Sesison_Full, Task, UserSessionFull } from '../services/auth';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgIf } from '@angular/common';
@@ -18,7 +18,7 @@ import { showAlert } from '../services/helper';
 
 export class SessionDetail {
   session : Sesison_Full | null = null;
-  displayed_tasks : Task[] | null = null;
+  displayed_tasks : Task[] | null = null; 
 
   userId : string;
 
@@ -31,7 +31,9 @@ export class SessionDetail {
   tobeDeletedTaskId: string | null = null;
   tobeEditedTaskId: string | null = null;
 
-  constructor(private route: ActivatedRoute, private authService: Auth) {}
+  isAdmin : boolean = true;
+
+  constructor(private route: ActivatedRoute, private authService: Auth, private router: Router) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -42,9 +44,26 @@ export class SessionDetail {
         this.users = session.userSessions;
         this.assignedToUserName = this.users.length > 0 ? this.users[0].userName : '';
         
+        const isMember = this.users.some(u => u.userName == this.authService.User);
+
+        if (!isMember) 
+        {
+          this.router.navigate(['/dashboard']);
+          return;
+        }
+
+        var thisUser = this.users.find(u => u.userName == this.authService.User);
+
+        console.log(thisUser);
+
+        if (thisUser.role == "User")
+        {
+          this.isAdmin = false;
+        }
+
         console.log('Fetched session details:', session);
 
-        this.displayed_tasks = [...(this.session?.tasks || [])];
+        this.displayed_tasks = [...(this.session?.tasks || [])];        
       },
       error: (error) => {
         console.error('Error fetching session details:', error);
@@ -168,6 +187,16 @@ export class SessionDetail {
   get doneTaskCount(): number {
     if (!this.displayed_tasks) return 0;
     return this.displayed_tasks.filter(t => t.status === "Done").length ?? 0;
+  }
+
+  get sortedUserSessions() {
+    if (!this.session || !this.session.userSessions) return [];
+
+    const roleOrder = { 'Creator': 0, 'Admin': 1, 'User': 2 };
+    
+    return [...this.session.userSessions].sort((a, b) => {
+      return (roleOrder[a.role] ?? 3) - (roleOrder[b.role] ?? 3);
+    });
   }
 
   public filterTasksByUser(userName: string) {
