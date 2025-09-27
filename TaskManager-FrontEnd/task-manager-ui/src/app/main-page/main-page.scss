@@ -139,6 +139,19 @@ a {
     background-color: #1f1f2c;
 }
 
+.session_card {
+    width: 500px;
+}
+
+.s_footer {
+    position: relative;
+    top: 80px;
+}
+
+.members_btn {
+    margin-left: 20px;
+}
+
 @media screen and (max-width: 768px) {
     .nav-link {
         margin-left: 10px;
@@ -156,6 +169,21 @@ a {
 
     .card #btn_delete {
         display: block;
+    }
+
+    .session_card {
+        width: 375px;
+        height: 300px;
+    }
+
+    .s_footer {
+        position: relative;
+        top: 35px;
+    }
+
+    .members_btn {
+        margin-top: 5px;
+        margin-left: 0px;
     }
     
 }

@@ -46,7 +46,7 @@
           <div *ngIf="is_loading" class="row row-cols-md-12 g-2 align-items-center justify-content-center" style="margin-top: 10%;">
             <div *ngFor="let l_session of load_Sessions" class="col" style="max-width: 500px !important; margin-right: 30px;">
               <a [routerLink]="['/sessions', l_session.id]" style="text-decoration: none; color: inherit;">
-                <div class="card d-flex flex-row p-2" style="width: 500px;">
+                <div class="card d-flex flex-row p-2 session_card">
                   <span class="imgD me-3"></span>
 
                   <div class="card-body text-start p-0" style="margin-top: 5px;">
@@ -65,7 +65,7 @@
                             style="width:32px; height:32px;">
                           +{{ l_session.userSessions.length - 3}}
                         </div>
-                        <div style="margin-left: 20px;">
+                        <div class="members_btn">
                             <button class="btn btn-outline-secondary me-2" (click)="ShowMembers($event, l_session.userSessions)" data-bs-toggle="modal" data-bs-target="#members">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
                                 <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
@@ -75,7 +75,7 @@
                         </div>
                     </div>
 
-                      <div class="mt-auto d-flex justify-content-end" style="position: relative; top: 80px;">
+                      <div class="mt-auto d-flex justify-content-end s_footer">
                         <a data-bs-toggle="modal" data-bs-target="#editsession" (click)="EditSession($event, l_session)" title="Edit Session" style="margin-right: 10px; color: grey;" id="btn_delete">
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -104,7 +104,7 @@
           <div *ngIf="participate_loading" class="row row-cols-md-12 g-2 align-items-center justify-content-center" style="margin-top: 10%;">
             <div *ngFor="let p_session of participate_Sessions" class="col" style="max-width: 500px !important; margin-right: 30px;">
               <a [routerLink]="['/sessions', p_session.id]" style="text-decoration: none; color: inherit; width: 480px !important;">
-                <div class="card d-flex flex-row p-2" style="width: 500px;">
+                <div class="card d-flex flex-row p-2 session_card">
                   <span class="imgD me-3"></span>
 
                   <div class="card-body text-start p-0" style="margin-top: 5px;">
@@ -123,7 +123,7 @@
                             style="width:32px; height:32px;">
                           +{{ p_session.userSessions.length - 3}}
                         </div>
-                        <div style="margin-left: 20px;">
+                        <div class="members_btn">
                             <button class="btn btn-outline-secondary me-2" (click)="ShowMembers($event, p_session.userSessions)" data-bs-toggle="modal" data-bs-target="#members">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
                                 <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
@@ -133,7 +133,7 @@
                         </div>
                     </div>
 
-                      <div class="mt-auto d-flex justify-content-end" style="position: relative; top: 80px;">
+                      <div class="mt-auto d-flex justify-content-end s_footer">
                         <a style="color: red;" data-bs-target="#deleteTaskModal" (click)="leaveSession(p_session.id, userName, $event)" title="Leave Session" id="btn_delete">
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
@@ -157,7 +157,7 @@
           <div *ngIf="archive_loading" class="row row-cols-md-5 g-5" style="margin-top: 10%;">
             <div *ngFor="let a_session of archive_Sessions" class="col" style="max-width: 500px !important; margin-right: 30px;">
               <a style="text-decoration: none; color: inherit;">
-                <div class="card d-flex flex-row p-2" style="width: 500px;">
+                <div class="card d-flex flex-row p-2 session_card">
                   <span class="imgD me-3"></span>
 
                   <div class="card-body text-start p-0" style="margin-top: 5px;">
@@ -176,7 +176,7 @@
                             style="width:32px; height:32px;">
                           +{{ a_session.userSessions.length - 3}}
                         </div>
-                        <div style="margin-left: 20px;">
+                        <div class="members_btn">
                             <button class="btn btn-outline-secondary me-2" (click)="ShowMembers($event, a_session.userSessions)" data-bs-toggle="modal" data-bs-target="#members">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
                                 <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
@@ -185,7 +185,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="mt-auto d-flex justify-content-end" style="position: relative; top: 80px;">
+                    <div class="mt-auto d-flex justify-content-end s_footer">
                       <a (click)="restoreSession(a_session.id, $event)" id="btn_restore" id="btn_delete" style="text-decoration: none; color: inherit; margin-right: 10px;" title="Restore session">
                         <img src="assets/Images/undo.png" alt="Profile photo" width="20" height="20"/>
                       </a>
