@@ -22,7 +22,7 @@ WORKDIR /app
 COPY --from=dotnet-build /app/out ./
 
 # Copy Angular build to wwwroot
-COPY --from=angular-build /app/dist/task-manager-ui ./wwwroot
+COPY --from=angular-build /app/dist/task-manager-ui/browser ./wwwroot
 
 # Expose port
 EXPOSE 80
