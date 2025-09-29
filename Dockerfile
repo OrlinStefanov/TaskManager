@@ -21,14 +21,14 @@ WORKDIR /app
 # Copy backend
 COPY --from=dotnet-build /app/out ./
 
-# Copy Angular build into wwwroot
-COPY --from=angular-build /app/dist/task-manager-ui ./wwwroot
+# Copy Angular build to wwwroot
+COPY --from=angular-build /app/dist/task-manager-ui/browser ./wwwroot
 
 # Expose port
 EXPOSE 80
 
-# Neon PostgreSQL connection string
+# Set environment variable for database
 ENV DefaultConnection="Host=ep-odd-feather-ag4lz7rz-pooler.c-2.eu-central-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=npg_oR9hqVwp7fTF;SSL Mode=Require;Trust Server Certificate=true"
 
-# Run backend
+# Run the backend
 ENTRYPOINT ["dotnet", "TaskManager.dll"]
