@@ -72,4 +72,11 @@ app.UseDeveloperExceptionPage();
 
 app.MapControllers();
 
+// Serve static files (Angular build)
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+// Fallback to index.html for Angular routes
+app.MapFallbackToFile("index.html");
+
 app.Run();
