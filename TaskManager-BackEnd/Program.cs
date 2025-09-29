@@ -11,8 +11,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+	?? builder.Configuration["DefaultConnection"];
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-	options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+	options.UseNpgsql(connectionString));
+
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 	.AddEntityFrameworkStores<ApplicationDbContext>()
