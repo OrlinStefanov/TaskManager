@@ -57,26 +57,27 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
-
-Endpoints.MapEndpoints(app);
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAngular"); // Use the CORS policy defined above
-
-app.UseAuthorization();
-app.UseDeveloperExceptionPage();
-
-app.MapControllers();
-
-// Serve static files (Angular build)
+// Serve Angular SPA first
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-// Fallback to index.html for Angular routes
+// Enable CORS for API
+app.UseCors("AllowAngular");
+
+// Authentication & Authorization
+app.UseAuthentication();
+app.UseAuthorization();
+
+// API routes
+app.MapControllers();
+
+// Fallback to Angular index.html for all other routes
 app.MapFallbackToFile("index.html");
 
 app.Run();
