@@ -40,7 +40,6 @@ builder.Services.ConfigureApplicationCookie(options =>
 	options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
-
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowAngular", policy =>
@@ -74,7 +73,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // API routes
-app.MapControllers();
+Endpoints.MapEndpoints(app);
 
 // Fallback to Angular index.html for all other routes
 app.MapFallbackToFile("index.html");
