@@ -1,9 +1,9 @@
 # Stage 1: Build Angular frontend
 FROM node:20-alpine AS angular-build
 WORKDIR /app
-COPY TaskManager-FrontEnd/package*.json ./
+COPY TaskManager-FrontEnd/task-manager-ui/package*.json ./
 RUN npm install
-COPY TaskManager-FrontEnd/ .
+COPY TaskManager-FrontEnd/task-manager-ui/ .
 RUN npm run build --prod
 
 # Stage 2: Build .NET backend
