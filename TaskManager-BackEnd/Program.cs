@@ -41,15 +41,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 
-// Configure CORS to allow requests from Angular development server
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowAngular", policy =>
 	{
-		policy.WithOrigins("http://localhost:4200") // Angular dev server
+		policy.WithOrigins("https://taskmanager-production-1.up.railway.app") // frontend URL
 			  .AllowAnyHeader()
-			  .AllowAnyMethod()
-			  .AllowCredentials(); // Required for cookies
+			  .AllowAnyMethod() // important: allow POST, PUT, DELETE
+			  .AllowCredentials();
 	});
 });
 
