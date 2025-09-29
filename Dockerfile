@@ -7,15 +7,15 @@ COPY TaskManager-FrontEnd/task-manager-ui/ .
 RUN npm run build --prod
 
 # Stage 2: Build .NET backend
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS dotnet-build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS dotnet-build
 WORKDIR /app
 COPY TaskManager-BackEnd/*.csproj ./
 RUN dotnet restore
 COPY TaskManager-BackEnd/ .
 RUN dotnet publish -c Release -o /app/out
 
-# Stage 3: Combine and run
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
+# Stage 3: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
 # Copy backend
