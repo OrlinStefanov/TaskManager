@@ -79,7 +79,7 @@ export class Auth {
   private userSubject = new BehaviorSubject<string | null>(null);
   user$ = this.userSubject.asObservable();
 
-  private apiUrl = 'https://localhost:7188'; //.NET API base URL
+  private apiUrl = "https://taskmanager-production-1.up.railway.app"; //'https://localhost:7188'; //.NET API base URL
 
   constructor(private http: HttpClient) {}
 
