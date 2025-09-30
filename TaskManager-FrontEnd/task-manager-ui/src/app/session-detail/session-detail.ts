@@ -67,6 +67,7 @@ export class SessionDetail {
       },
       error: (error) => {
         console.error('Error fetching session details:', error);
+        this.router.navigate(['/dashboard']);
       }
     });
   }
